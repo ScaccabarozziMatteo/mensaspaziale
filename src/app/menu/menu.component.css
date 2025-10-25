@@ -1,0 +1,11 @@
+.menu-day {
+  background: #fafafa;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+}
+
+h3 {
+  color: #007b83;
+}

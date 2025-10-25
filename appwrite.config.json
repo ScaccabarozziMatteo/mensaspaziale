@@ -1,0 +1,157 @@
+{
+    "projectId": "68fc98fb001d33ecc5b5",
+    "endpoint": "https://fra.cloud.appwrite.io/v1",
+    "projectName": "mensaspaziale",
+    "settings": {
+        "services": {
+            "account": true,
+            "avatars": true,
+            "databases": true,
+            "locale": true,
+            "health": true,
+            "storage": true,
+            "teams": true,
+            "users": true,
+            "sites": true,
+            "functions": true,
+            "graphql": true,
+            "messaging": true
+        },
+        "auth": {
+            "methods": {
+                "jwt": true,
+                "phone": true,
+                "invites": true,
+                "anonymous": true,
+                "email-otp": true,
+                "magic-url": true,
+                "email-password": true
+            },
+            "security": {
+                "duration": 31536000,
+                "limit": 0,
+                "sessionsLimit": 10,
+                "passwordHistory": 0,
+                "passwordDictionary": false,
+                "personalDataCheck": false,
+                "sessionAlerts": false,
+                "mockNumbers": []
+            }
+        }
+    },
+    "tablesDB": [
+        {
+            "$id": "68fc9c4a00261282e43d",
+            "name": "winter_menu",
+            "enabled": true
+        }
+    ],
+    "tables": [
+        {
+            "$id": "week1",
+            "$permissions": [],
+            "databaseId": "68fc9c4a00261282e43d",
+            "name": "menu2025_2026",
+            "enabled": true,
+            "rowSecurity": false,
+            "columns": [
+                {
+                    "key": "day",
+                    "type": "integer",
+                    "required": true,
+                    "array": false,
+                    "min": 0,
+                    "max": 4,
+                    "default": null
+                },
+                {
+                    "key": "primi_piatti",
+                    "type": "string",
+                    "required": false,
+                    "array": true,
+                    "size": 100,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "secondi_piatti",
+                    "type": "string",
+                    "required": false,
+                    "array": true,
+                    "size": 100,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "piatto_dello_chef",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 100,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "contorni",
+                    "type": "string",
+                    "required": false,
+                    "array": true,
+                    "size": 100,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "alternative_variabili",
+                    "type": "string",
+                    "required": false,
+                    "array": true,
+                    "size": 100,
+                    "default": null,
+                    "encrypt": false
+                },
+                {
+                    "key": "week",
+                    "type": "integer",
+                    "required": true,
+                    "array": false,
+                    "min": 0,
+                    "max": 3,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        }
+    ],
+    "sites": [
+        {
+            "$id": "mensaspaziale",
+            "name": "Mensa Spaziale",
+            "framework": "angular",
+            "adapter": "static",
+            "buildRuntime": "node-22",
+            "installCommand": "npm install",
+            "buildCommand": "bash prepare-env.sh && npm run build",
+            "outputDirectory": "./dist/angular-starter-kit-for-appwrite/browser",
+            "fallbackFile": "index.html",
+            "specification": "s-0.5vcpu-512mb",
+            "enabled": true,
+            "timeout": 30,
+            "logging": true,
+            "path": "sites/Mensa Spaziale",
+            "vars": [
+                {
+                    "key": "APPWRITE_ENDPOINT",
+                    "value": "https://cloud.appwrite.io/v1"
+                },
+                {
+                    "key": "APPWRITE_PROJECT_ID",
+                    "value": "68fc98fb001d33ecc5b5"
+                },
+                {
+                    "key": "APPWRITE_PROJECT_NAME",
+                    "value": "mensaspaziale"
+                }
+            ]
+        }
+    ]
+}
