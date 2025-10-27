@@ -3,14 +3,14 @@
 }
 @else {
 <div>
-  <h2>Menu Settimana {{ menu.week }}</h2>
+  <h2>Menu Settimana {{ menuWeekNumber + 1 }}</h2>
 </div>
   <div>
-    <h3>Giorno {{ menu.day }}</h3>
-    <p><strong>Primi Piatti:</strong> {{ menu.primi_piatti.join(', ') }}</p>
-    <p><strong>Secondi Piatti:</strong> {{ menu.secondi_piatti.join(', ') }}</p>
-    <p><strong>Piatto dello Chef:</strong> {{ menu.piatto_dello_chef }}</p>
-    <p><strong>Contorni:</strong> {{ menu.contorni.join(', ') }}</p>
-    <p><strong>Alternative Variabili:</strong> {{ menu.alternative_variabili.join(', ') }}</p>
+    <h3>{{ italianDayName() }}</h3>
+    <p><strong>Primi Piatti:</strong> {{ menu()?.primi_piatti?.join(', ') }}</p>
+    <p><strong>Secondi Piatti:</strong> {{ menu()?.secondi_piatti?.join(', ') }}</p>
+    <p><strong>Piatto dello Chef:</strong> {{ menu()?.piatto_dello_chef }}</p>
+    <p><strong>Contorni:</strong> {{ menu()?.contorni?.join(', ') }}</p>
+    <p><strong>Alternative Variabili:</strong> {{ menu()?.alternative_variabili?.join(', ') }}</p>
   </div>
 }
