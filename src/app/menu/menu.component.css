@@ -23,10 +23,12 @@
   padding-right: 1.1em;
   text-align: left;
   width: 33%;
+  align-self: center;
 }
 
 #dishesContainer {
   width: 67%;
+  align-content: center;
 }
 
 #dayIndicator {
