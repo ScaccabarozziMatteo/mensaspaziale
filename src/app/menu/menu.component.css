@@ -20,13 +20,13 @@
 #courseTitle {
   font-weight: bold;
   font-size: 1.3em;
-  padding-right: 1.3em;
+  padding-right: 1.1em;
   text-align: left;
-  width: 32%;
+  width: 33%;
 }
 
 #dishesContainer {
-  width: 68%;
+  width: 67%;
 }
 
 #dayIndicator {
