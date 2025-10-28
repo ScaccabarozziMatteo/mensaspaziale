@@ -1,16 +1,16 @@
-<div id="container">
+<div>
   <h1 id="title">Mensa Spaziale</h1>
 
   @if(loading) {
   <p>Caricamento menu in corso...</p>
   }
   @else {
-  <div>
+  <div id="container">
 
     <div id="courseContainer">
       <p id="courseTitle">Primi</p>
-      <div id="dishedContainer">
-        @for (dish of menu()?.primi_piatti; track menu()?.primi_piatti) {
+      <div id="dishesContainer">
+        @for (dish of menu()?.primi_piatti; track dish) {
         <p>{{ dish }}</p>
         }
       </div>
@@ -18,8 +18,8 @@
 
     <div id="courseContainer">
       <p id="courseTitle">Secondi</p>
-      <div id="dishedContainer">
-        @for (dish of menu()?.secondi_piatti; track menu()?.secondi_piatti) {
+      <div id="dishesContainer">
+        @for (dish of menu()?.secondi_piatti; track dish) {
         <p>{{ dish }}</p>
         }
       </div>
@@ -27,8 +27,8 @@
 
     <div id="courseContainer">
       <p id="courseTitle">Contorni</p>
-      <div id="dishedContainer">
-        @for (dish of menu()?.contorni; track menu()?.contorni) {
+      <div id="dishesContainer">
+        @for (dish of menu()?.contorni; track dish) {
         <p>{{ dish }}</p>
         }
       </div>
@@ -36,15 +36,15 @@
 
     <div id="courseContainer">
       <p id="courseTitle">Piatto dello Chef</p>
-      <div id="dishedContainer">
+      <div id="dishesContainer">
     <p>{{ menu()?.piatto_dello_chef }}</p>
       </div>
     </div>
     
     <div id="courseContainer">
       <p id="courseTitle">Alternative Variabili</p>
-      <div id="dishedContainer">
-    @for (dish of menu()?.alternative_variabili; track menu()?.alternative_variabili) {
+      <div id="dishesContainer">
+    @for (dish of menu()?.alternative_variabili; track dish) {
         <p>{{ dish }}</p>
         }
       </div>

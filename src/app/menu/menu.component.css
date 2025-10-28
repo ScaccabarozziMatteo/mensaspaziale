@@ -8,24 +8,25 @@
 
 #container {
   background-color: #000000d4;
-  padding: 0 4rem
-  
+  padding: 0 1rem;
+  align-items: center;
 }
 
 #courseContainer {
   display: flex;
+  flex-direction: row;
 }
 
 #courseTitle {
-  text-align: center;
   font-weight: bold;
-  font-size: 1.4em;
-  min-width: 250px ;
-  align-self: center;
+  font-size: 1.3em;
+  padding-right: 1.6em;
+  text-align: left;
+  width: 30%;
 }
 
-#dishedContainer {
-  align-self: center;
+#dishesContainer {
+  width: 70%;
 }
 
 #dayIndicator {
@@ -37,4 +38,25 @@
   text-align: center;
   font-style: italic;
   font-size: smaller;
+}
+
+:host {
+    color: white;
+    margin: 0;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+      "Segoe UI Symbol";
+}
+
+#title {
+    font-family: SuperFunky;
+    font-size: 4ex;
+    color: #fff;
+    text-align: center;
+ 
+}
+
+@font-face {
+  font-family: SuperFunky;
+  src: url(/fonts/super-funky-font/SuperFunky-lgmWw.ttf) format('truetype');
 }
