@@ -1,16 +1,59 @@
-@if(loading) {
+<div id="container">
+  <h1 id="title">Mensa Spaziale</h1>
+
+  @if(loading) {
   <div>Loading menu...</div>
-}
-@else {
-<div>
-  <h2>Menu Settimana {{ menuWeekNumber + 1 }}</h2>
-</div>
+  }
+  @else {
   <div>
-    <h3>{{ italianDayName() }}</h3>
-    <p><strong>Primi Piatti:</strong> {{ menu()?.primi_piatti?.join(', ') }}</p>
-    <p><strong>Secondi Piatti:</strong> {{ menu()?.secondi_piatti?.join(', ') }}</p>
-    <p><strong>Piatto dello Chef:</strong> {{ menu()?.piatto_dello_chef }}</p>
-    <p><strong>Contorni:</strong> {{ menu()?.contorni?.join(', ') }}</p>
-    <p><strong>Alternative Variabili:</strong> {{ menu()?.alternative_variabili?.join(', ') }}</p>
+
+    <div id="courseContainer">
+      <p id="courseTitle">Primi</p>
+      <div id="dishedContainer">
+        @for (dish of menu()?.primi_piatti; track menu()?.primi_piatti) {
+        <p>{{ dish }}</p>
+        }
+      </div>
+    </div>
+
+    <div id="courseContainer">
+      <p id="courseTitle">Secondi</p>
+      <div id="dishedContainer">
+        @for (dish of menu()?.secondi_piatti; track menu()?.secondi_piatti) {
+        <p>{{ dish }}</p>
+        }
+      </div>
+    </div>
+
+    <div id="courseContainer">
+      <p id="courseTitle">Contorni</p>
+      <div id="dishedContainer">
+        @for (dish of menu()?.contorni; track menu()?.contorni) {
+        <p>{{ dish }}</p>
+        }
+      </div>
+    </div>
+
+    <div id="courseContainer">
+      <p id="courseTitle">Piatto dello Chef</p>
+      <div id="dishedContainer">
+    <p>{{ menu()?.piatto_dello_chef }}</p>
+      </div>
+    </div>
+    
+    <div id="courseContainer">
+      <p id="courseTitle">Alternative Variabili</p>
+      <div id="dishedContainer">
+    @for (dish of menu()?.alternative_variabili; track menu()?.alternative_variabili) {
+        <p>{{ dish }}</p>
+        }
+      </div>
+    </div>
+
   </div>
-}
+  <div>
+    <p id="dayIndicator">{{ italianDayName() }} - Settimana {{ menuWeekNumber + 1 }}</p>
+    <p id="disclaimer">Progetto indipendente, il menù è puramente indicativo.</p>
+  </div>
+  }
+</div>

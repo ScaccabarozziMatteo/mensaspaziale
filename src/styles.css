@@ -1,2 +1,16 @@
-/* You can add global styles to this file, and also import other style files */
-@import url('https://unpkg.com/bootstrap@3.3.7/dist/css/bootstrap.min.css');
+body {
+    color: white;
+}
+
+#title {
+    font-family: SuperFunky;
+    font-size: 4ex;
+    color: #fff;
+    text-align: center;
+ 
+}
+
+@font-face {
+  font-family: SuperFunky;
+  src: url(/fonts/super-funky-font/SuperFunky-lgmWw.ttf) format('truetype');
+}

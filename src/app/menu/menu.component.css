@@ -6,6 +6,35 @@
   border-radius: 8px;
 }
 
-h3 {
-  color: #007b83;
+#container {
+  background-color: #000000d4;
+  padding: 0 4rem
+  
+}
+
+#courseContainer {
+  display: flex;
+}
+
+#courseTitle {
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.4em;
+  min-width: 250px ;
+  align-self: center;
+}
+
+#dishedContainer {
+  align-self: center;
+}
+
+#dayIndicator {
+  padding-top: 30px;
+  text-align: center;
+}
+
+#disclaimer {
+  text-align: center;
+  font-style: italic;
+  font-size: smaller;
 }
