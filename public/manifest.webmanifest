@@ -1,8 +1,10 @@
 {
-  "name": "mensaspaziale",
+  "name": "Mensa Spaziale",
   "short_name": "mensaspaziale",
   "display": "standalone",
   "scope": "./",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "start_url": "./",
   "icons": [
     {
