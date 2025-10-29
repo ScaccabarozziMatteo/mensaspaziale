@@ -8,7 +8,7 @@ import { DailyMenu } from '../models/menu.model';
   styleUrls: ['./menu.component.css']
 })
 export class MenuComponent implements OnInit {
-  menu = signal<DailyMenu|null>(null);
+  menu = signal<DailyMenu | null>(null);
   italianDayName = signal<string>('')
   loading = signal(true);
   error = signal(false);
@@ -21,38 +21,47 @@ export class MenuComponent implements OnInit {
     this.menuWeekNumber = this.getWeekNumber()
     this.dayOfWeekNumber = this.getDayOfWeek()
     this.italianDayName.set(this.getItalianDayName())
-    
+
     console.log("Menù week number: " + this.menuWeekNumber)
     console.log("Day of week number: " + this.dayOfWeekNumber)
-    
+
     this.getMenuWeekNumber()
     this.loadMenu();
   }
 
   async loadMenu() {
     try {
-      console.log(localStorage.getItem('menu'))
-      if(localStorage.getItem('menu') === undefined || localStorage.getItem('menu') === null) {
-        console.log('No menù stored')
+      const cachedMenu = localStorage.getItem('menu')
+      if (cachedMenu !== undefined && cachedMenu !== null) {
+        console.log('Menù presente in cache')
+        const menuDate = JSON.parse(cachedMenu).date
+        const today = new Date().toLocaleDateString()
+        if (menuDate === today) {
+          console.log('Menù aggiornato alla data corrente')
+          this.menu.set(JSON.parse(localStorage.getItem('menu')!) as DailyMenu)
+          this.loading.set(false)
+          this.error.set(false)
+        } else {
+          console.log('Menù non aggiornato')
+          this.menu.set(null)
+        }
+      }
+      if (this.menu() === null) {
+        console.log('Menù non presente o non aggiornato, scaricamento menù aggiornato in corso..')
         this.appwrite.getMenu(this.menuWeekNumber, this.dayOfWeekNumber).catch(error => {
           console.error(error);
           this.error.set(true);
           this.loading.set(false)
         }).then(value => {
-            this.menu.set(value);
-            if(value !== undefined) {
-              localStorage.setItem('menu', JSON.stringify(this.menu()))
-              this.loading.set(false)
-              this.error.set(false)
-            }
-      })
-          
-      } else {
-        console.log('Menù presente in cache')
-        this.menu.set(JSON.parse(localStorage.getItem('menu')!) as DailyMenu)
-        this.loading.set(false)
-        this.error.set(false)
+          this.menu.set(value);
+          if (value !== undefined) {
+            localStorage.setItem('menu', JSON.stringify(this.menu()))
+            this.loading.set(false)
+            this.error.set(false)
+          }
+        })
       }
+
     } catch (err) {
       console.error('Error fetching menu:', err);
       this.loading.set(false)
@@ -87,18 +96,18 @@ export class MenuComponent implements OnInit {
 
 
   getItalianDayName(date: Date = new Date()): string {
-  const giorni = [
-    'Lunedì',     // 0
-    'Martedì',    // 1
-    'Mercoledì',  // 2
-    'Giovedì',    // 3
-    'Venerdì',    // 4
-    'Sabato',     // 5
-    'Domenica'    // 6
-  ];
+    const giorni = [
+      'Lunedì',     // 0
+      'Martedì',    // 1
+      'Mercoledì',  // 2
+      'Giovedì',    // 3
+      'Venerdì',    // 4
+      'Sabato',     // 5
+      'Domenica'    // 6
+    ];
 
-  const index = (date.getDay() + 6) % 7; // shift so Monday=0
-  return giorni[index];
-}
+    const index = (date.getDay() + 6) % 7; // shift so Monday=0
+    return giorni[index];
+  }
 
 }

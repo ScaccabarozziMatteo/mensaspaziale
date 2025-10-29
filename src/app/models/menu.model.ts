@@ -7,6 +7,7 @@ export class DailyMenu {
     public secondi_piatti: string[],
     public piatto_dello_chef: string,
     public contorni: string[],
-    public alternative_variabili: string[]
+    public alternative_variabili: string[],
+    public date: string
   ) {}
 }

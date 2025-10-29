@@ -37,7 +37,7 @@ export class AppwriteService {
     }
     ).then(res => {
       const rawMenu = res.rows[0];
-      return new DailyMenu(rawMenu.$id, rawMenu.week, rawMenu.day, rawMenu.primi_piatti, rawMenu.secondi_piatti, rawMenu.piatto_dello_chef, rawMenu.contorni, rawMenu.alternative_variabili)   
+      return new DailyMenu(rawMenu.$id, rawMenu.week, rawMenu.day, rawMenu.primi_piatti, rawMenu.secondi_piatti, rawMenu.piatto_dello_chef, rawMenu.contorni, rawMenu.alternative_variabili, new Date().toLocaleDateString())   
     })
     return result
   }
