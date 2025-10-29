@@ -10,7 +10,8 @@ import { DailyMenu } from '../models/menu.model';
 export class MenuComponent implements OnInit {
   menu = signal<DailyMenu|null>(null);
   italianDayName = signal<string>('')
-  loading = true;
+  loading = signal(true);
+  error = signal(false);
   menuWeekNumber = 0;
   private dayOfWeekNumber = 0;
 
@@ -30,12 +31,32 @@ export class MenuComponent implements OnInit {
 
   async loadMenu() {
     try {
-      this.menu.set(await this.appwrite.getMenu(this.menuWeekNumber, this.dayOfWeekNumber))
+      console.log(localStorage.getItem('menu'))
+      if(localStorage.getItem('menu') === undefined || localStorage.getItem('menu') === null) {
+        console.log('No menù stored')
+        this.appwrite.getMenu(this.menuWeekNumber, this.dayOfWeekNumber).catch(error => {
+          console.error(error);
+          this.error.set(true);
+          this.loading.set(false)
+        }).then(value => {
+            this.menu.set(value);
+            if(value !== undefined) {
+              localStorage.setItem('menu', JSON.stringify(this.menu()))
+              this.loading.set(false)
+              this.error.set(false)
+            }
+      })
+          
+      } else {
+        console.log('Menù presente in cache')
+        this.menu.set(JSON.parse(localStorage.getItem('menu')!) as DailyMenu)
+        this.loading.set(false)
+        this.error.set(false)
+      }
     } catch (err) {
       console.error('Error fetching menu:', err);
-    } finally {
-      this.loading = false;
-      console.log(this.menu())
+      this.loading.set(false)
+      this.error.set(true)
     }
   }
 

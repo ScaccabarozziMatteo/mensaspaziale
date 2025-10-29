@@ -1,8 +1,14 @@
 <div>
   <h1 id="title">Mensa Spaziale</h1>
 
-  @if(loading) {
+  @if(loading()) {
   <p style="text-align: center;">Caricamento menu in corso...</p>
+  }
+  @else if(error()) {
+  <div>
+    <p style="text-align: center;">Impossibile caricare il menu.</p>
+    <p style="text-align: center;">Controlla la connessione ad internet e ricarica la pagina.</p>
+  </div>
   }
   @else {
   <div id="container">
@@ -37,14 +43,14 @@
     <div id="courseContainer">
       <p id="courseTitle">Piatto dello Chef</p>
       <div id="dishesContainer">
-    <p>{{ menu()?.piatto_dello_chef }}</p>
+        <p>{{ menu()?.piatto_dello_chef }}</p>
       </div>
     </div>
-    
+
     <div id="courseContainer">
       <p id="courseTitle">Alternative Variabili</p>
       <div id="dishesContainer">
-    @for (dish of menu()?.alternative_variabili; track dish) {
+        @for (dish of menu()?.alternative_variabili; track dish) {
         <p>{{ dish }}</p>
         }
       </div>
@@ -52,7 +58,8 @@
 
   </div>
   <div>
-    <p id="dayIndicator"><span style="font-weight: bold;">{{ italianDayName() }}</span> - Settimana {{ menuWeekNumber + 1 }}</p>
+    <p id="dayIndicator"><span style="font-weight: bold;">{{ italianDayName() }}</span> - Settimana {{ menuWeekNumber +
+      1 }}</p>
     <p id="disclaimer">Progetto indipendente, il menù è puramente indicativo.</p>
   </div>
   }
