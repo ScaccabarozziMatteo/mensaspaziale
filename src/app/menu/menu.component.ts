@@ -1,17 +1,21 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { AppwriteService } from '../../lib/appwrite';
 import { DailyMenu } from '../models/menu.model';
+import { StarsDirective } from '../service/stars.directive';
 
 @Component({
   selector: 'app-menu',
   templateUrl: './menu.component.html',
-  styleUrls: ['./menu.component.css']
+  styleUrls: ['./menu.component.css'],
+  imports: [StarsDirective]
+ 
 })
 export class MenuComponent implements OnInit {
   menu = signal<DailyMenu | null>(null);
   italianDayName = signal<string>('')
   loading = signal(true);
   error = signal(false);
+  weekend = signal(false);
   menuWeekNumber = 0;
   private dayOfWeekNumber = 0;
 
@@ -24,6 +28,9 @@ export class MenuComponent implements OnInit {
 
     console.log("Menù week number: " + this.menuWeekNumber)
     console.log("Day of week number: " + this.dayOfWeekNumber)
+
+    // Check if today is a weekend day
+    this.handleWeekend()
 
     this.getMenuWeekNumber()
     this.loadMenu();
@@ -80,6 +87,10 @@ export class MenuComponent implements OnInit {
     const weekNo = Math.ceil(((currentDate.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
 
     return weekNo;
+  }
+
+  handleWeekend() {
+    this.weekend.set(this.dayOfWeekNumber > 4)
   }
 
   getMenuWeekNumber() {

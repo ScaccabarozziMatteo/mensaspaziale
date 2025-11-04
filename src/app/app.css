@@ -1,13 +1,3 @@
-/* Style the video: 100% width and height to cover the entire window */
-#myVideo {
-
-    position: fixed;
-    z-index: -200;
-    right: 0;
-    bottom: 0;
-    
-}
-
 /* Add some content at the bottom of the video/page */
 .content {
     position: fixed;
