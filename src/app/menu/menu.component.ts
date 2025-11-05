@@ -2,13 +2,12 @@ import { Component, OnInit, signal } from '@angular/core';
 import { AppwriteService } from '../../lib/appwrite';
 import { DailyMenu } from '../models/menu.model';
 import { StarsDirective } from '../service/stars.directive';
-import { MenuSectionComponent } from './menu-elements/menu-section.component';
 
 @Component({
   selector: 'app-menu',
   templateUrl: './menu.component.html',
   styleUrls: ['./menu.component.css'],
-  imports: [StarsDirective, MenuSectionComponent]
+  imports: [StarsDirective]
  
 })
 export class MenuComponent implements OnInit {
