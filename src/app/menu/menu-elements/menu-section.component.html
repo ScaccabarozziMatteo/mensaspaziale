@@ -1,0 +1,27 @@
+<div class="menuContainer">
+        <div class="menu-section">
+          <div class="section-header">
+            <div class="section-title-group">
+              <span class="section-icon">🍝</span>
+              <h2 class="section-title">Primi</h2>
+            </div>
+          </div>
+          <div class="dishes-grid">
+            @for (dish of menu()?.primi_piatti; track dish) {
+            <div class="dish-item">
+              <div class="dish-header">
+                <div class="dish-name">
+                  <p>{{ dish }}</p>
+                  <div class="dish-info">
+                    <!--
+                    <span class="tag vegetarian">🌱</span>
+                       tag === 'vegan' ? '🌿 Vegano' :
+                      tag === 'fish' ? '🐟 Pesce' : '🍖 Carne'} -->
+                  </div>
+                </div>
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
