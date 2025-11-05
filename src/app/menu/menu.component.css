@@ -124,7 +124,6 @@ header {
   flex-direction: column;
   width: fit-content;
   flex: 1 1 auto;
-  min-width: 200px;
   max-width: 100%;
 }
 
@@ -162,11 +161,15 @@ header {
 
 .dish-name {
   color: rgba(255, 255, 255, 0.9);
-  font-weight: lighter;
+  font-weight: 500;
   display: flex;
   align-items: center;
   gap: 8px;
-  white-space: nowrap;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  flex: 1;
+  line-height: 1.4;
 }
 
 .dish-info {
@@ -174,7 +177,7 @@ header {
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  width: 100%;
+  width: 0;
 }
 
 .dishes-grid {
@@ -254,29 +257,38 @@ header {
 
 
 .title-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
 }
 
 .title-emoji {
-    font-size: 2.5rem;
-    animation: pulse 2s ease-in-out infinite;
+  font-size: 2.5rem;
+  animation: pulse 2s ease-in-out infinite;
 }
 
 @keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.2); opacity: 0.8; }
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
 }
 
 .subtitle {
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.7);
-    font-weight: 300;
-    letter-spacing: 2px;
-    margin: 0 0 20px;
-    font-style: italic;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 300;
+  letter-spacing: 2px;
+  margin: 0 0 20px;
+  font-style: italic;
 }
 
 
@@ -284,34 +296,34 @@ header {
 
 
 footer {
-    text-align: center;
-    margin-top: 48px;
-    padding: 24px;
-    font-style: italic;
-    opacity: 0.8;
-    font-size: 0.875rem;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    align-items: center;
+  text-align: center;
+  margin-top: 48px;
+  padding: 24px;
+  font-style: italic;
+  opacity: 0.8;
+  font-size: 0.875rem;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
 }
 
 .github-link-minimal {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: rgba(255, 255, 255, 0.7);
-    text-decoration: none;
-    font-style: normal;
-    font-size: 0.8rem;
-    transition: color 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-style: normal;
+  font-size: 0.8rem;
+  transition: color 0.3s ease;
 }
 
 .github-link-minimal:hover {
-    color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .github-link-minimal svg {
-    width: 16px;
-    height: 16px;
+  width: 16px;
+  height: 16px;
 }
