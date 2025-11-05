@@ -93,6 +93,7 @@
 header {
   text-align: center;
   margin-bottom: 15px;
+  justify-content: center;
   animation: fadeInDown 0.8s ease-out;
 }
 
@@ -264,7 +265,7 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  gap: 15px;
 }
 
 .title-emoji {
