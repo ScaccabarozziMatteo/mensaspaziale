@@ -4,11 +4,13 @@ import { DailyMenu } from '../models/menu.model';
 import { StarsDirective } from '../service/stars.directive';
 import { MenuSectionComponent } from './menu-elements/menu-section.component';
 
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+
 @Component({
   selector: 'app-menu',
   templateUrl: './menu.component.html',
   styleUrls: ['./menu.component.css'],
-  imports: [StarsDirective, MenuSectionComponent]
+  imports: [StarsDirective, MenuSectionComponent, MatProgressSpinnerModule]
  
 })
 export class MenuComponent implements OnInit {

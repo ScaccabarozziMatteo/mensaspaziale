@@ -48,19 +48,6 @@
     "Segoe UI Symbol";
 }
 
-#title {
-  font-family: SuperFunky;
-  font-size: 3ex;
-  color: #fff;
-  text-align: center;
-
-}
-
-@font-face {
-  font-family: SuperFunky;
-  src: url(/fonts/super-funky-font/SuperFunky-lgmWw.ttf) format('truetype');
-}
-
 /* Style the video: 100% width and height to cover the entire window */
 #myVideo {
   position: fixed;
@@ -109,6 +96,7 @@ h1 {
   transition: all 0.3s ease;
   margin-bottom: 20px;
   animation: fadeInUp 0.6s ease-out backwards;
+  justify-items: center;
 }
 
 .dish-header {
@@ -165,6 +153,7 @@ h1 {
   flex-wrap: wrap;
   margin: 0 18px 18px 18px;
   gap: 18px;
+  width: -webkit-fill-available;
 }
 
 .section-content.expanded {
@@ -307,4 +296,9 @@ footer {
 .github-link-minimal svg {
   width: 16px;
   height: 16px;
+}
+
+.mat-spinner-color::ng-deep circle {
+  stroke: #dbeafe !important;
+  justify-self: center;
 }
