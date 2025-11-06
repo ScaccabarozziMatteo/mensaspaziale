@@ -139,31 +139,6 @@ h1 {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-@media (max-width: 568px) {
-  .dishes-grid {
-    flex-direction: column;
-    margin-bottom: 18px;
-  }
-
-  .dish-item {
-    width: auto;
-    margin: 0 18px;
-    max-width: -webkit-fill-available;
-  }
-
-  .dish-name {
-    white-space: normal;
-  }
-}
-
-@media (min-width: 569px) {
-  .dishes-grid {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    margin: 0 18px 18px 18px;
-    gap: 18px;
-  }
-}
-
 .dish-name {
   color: rgba(255, 255, 255, 0.9);
   font-weight: 300;
@@ -173,7 +148,7 @@ h1 {
   white-space: normal;
   word-wrap: break-word;
   overflow-wrap: break-word;
-  flex: 1;
+  flex: 1 1 initial;
   line-height: 1.4;
 }
 
@@ -188,7 +163,8 @@ h1 {
 .dishes-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  margin: 0 18px 18px 18px;
+  gap: 18px;
 }
 
 .section-content.expanded {
