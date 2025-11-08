@@ -20,27 +20,29 @@
 
     <!--BODY-->
     <div>
-      @if(loading()) {
-      <div class="menu-section">
-        <p class="dish-name" style="text-align: center;">Caricamento menu in corso...</p>
-        <div style="margin-bottom: inherit;">
+      @if(weekend()) {
+      <div class="menu-section" style="padding: 2cap;">
+        <h2 class="dish-name" >È tempo di godersi il weekend..</h2>
+        <h3 class="dish-name" >Ci vediamo lunedì!</h3>
+        <img style="display: block; margin-left: auto; margin-right: auto; max-width: 80%;" src="/data/moon.gif" />
+      </div>
+      }
+      @else if(loading()) {
+      <div class="menu-section" style="align-self: center;">
+        <h2 class="dish-name" style="font-weight: 600;">Caricamento menu in corso...</h2>
+        <div style="margin: 2rem; width: auto; text-align: -webkit-center;">
           <mat-spinner class="mat-spinner-color" />
         </div>
       </div>
 
       }
       @else if(error()) {
-      <div class="menu-section">
-        <h2 class="dish-name" >Impossibile caricare il menu.</h2>
-        <h3 class="dish-name" >Controlla la connessione ad internet e ricarica la pagina.</h3>
+      <div class="menu-section" style="padding: 2cap;">
+        <h2 class="dish-name" style="font-weight: 600;">Impossibile caricare il menu</h2>
+        <h3 class="dish-name" style="margin-bottom: 0;">Il menù di oggi si è perso tra Saturno e Marte.</h3>
+        <h3 class="dish-name" style="margin-top: 0.6rem;">Riprova a breve, il modulo pranzo è in fase di rientro. 🚀🥗</h3>
       </div>
-      }
-      @else if (weekend()) {
-      <div class="menu-section">
-        <h2 class="dish-name">È tempo di godersi il weekend..</h2>
-        <h3 class="dish-name" >Ci vediamo lunedì!</h3>
-        <img style="display: block; margin-left: auto; margin-right: auto; max-width: 80%;" src="/data/moon.gif" />
-      </div>
+
       }
       @else {
 

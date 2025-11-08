@@ -138,6 +138,7 @@ h1 {
   overflow-wrap: break-word;
   flex: 1 1 initial;
   line-height: 1.4;
+  justify-content: center;
 }
 
 .dish-info {

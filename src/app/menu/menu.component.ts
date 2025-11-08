@@ -36,7 +36,10 @@ export class MenuComponent implements OnInit {
     this.handleWeekend()
 
     this.getMenuWeekNumber()
-    this.loadMenu();
+
+    if(!this.weekend()) {
+      this.loadMenu();
+    }
   }
 
   async loadMenu() {
