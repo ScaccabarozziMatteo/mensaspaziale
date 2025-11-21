@@ -97,6 +97,18 @@ h1 {
   margin-bottom: 20px;
   animation: fadeInUp 0.6s ease-out backwards;
   justify-items: center;
+  min-width: fit-content;
+}
+
+.menuContainer {
+  min-width: fit-content;
+}
+
+.menuBody {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .dish-header {
@@ -189,6 +201,7 @@ h1 {
   align-items: center;
   justify-content: center;
   width: 100%;
+  margin: 0 18px 0 18px;
   gap: 16px;
 }
 
