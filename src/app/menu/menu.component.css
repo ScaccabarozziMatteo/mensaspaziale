@@ -109,6 +109,7 @@ h1 {
   gap: 15px;
   flex-wrap: wrap;
   justify-content: center;
+  padding-top: 25px;
 }
 
 .dish-header {
