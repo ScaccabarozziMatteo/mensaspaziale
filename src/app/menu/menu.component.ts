@@ -159,6 +159,17 @@ export class MenuComponent implements OnInit {
         title: 'Alternative Variabili',
         icon: '🧀',
         dishes: this.menu()?.alternative_variabili!
+      },
+      {
+        title: 'Dessert',
+        icon: '🍰',
+        dishes: [
+          'Frutta di stagione',
+          'Polpa di frutta',
+          'Snack dolce',
+          'Yogurt',
+          'Budino vaniglia o cioccolato'
+        ]
       }
     ]
   }
