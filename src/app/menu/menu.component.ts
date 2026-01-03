@@ -1,17 +1,17 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { AppwriteService } from '../../lib/appwrite';
 import { DailyMenu } from '../models/menu.model';
 import { StarsDirective } from '../service/stars.directive';
 import { MenuSectionComponent } from './menu-elements/menu-section.component';
 
-import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-menu',
   templateUrl: './menu.component.html',
   styleUrls: ['./menu.component.css'],
   imports: [StarsDirective, MenuSectionComponent, MatProgressSpinnerModule]
- 
+
 })
 export class MenuComponent implements OnInit {
   menu = signal<DailyMenu | null>(null);
@@ -22,7 +22,9 @@ export class MenuComponent implements OnInit {
   menuWeekNumber = 0;
   private dayOfWeekNumber = 0;
 
-  constructor(private appwrite: AppwriteService) { }
+  coursesCreator!: { title: string; icon: string; dishes: string[]; }[];
+
+  private appwrite = inject(AppwriteService)
 
   ngOnInit(): void {
     this.menuWeekNumber = this.getWeekNumber()
@@ -37,23 +39,27 @@ export class MenuComponent implements OnInit {
 
     this.getMenuWeekNumber()
 
-    if(!this.weekend()) {
+    if (!this.weekend()) {
       this.loadMenu();
+      this.createMenu();
     }
   }
 
   async loadMenu() {
     try {
       const cachedMenu = localStorage.getItem('menu')
+
       if (cachedMenu !== undefined && cachedMenu !== null) {
         console.log('Menù presente in cache')
         const menuDate = JSON.parse(cachedMenu).date
         const today = new Date().toLocaleDateString()
+
         if (menuDate === today) {
           console.log('Menù aggiornato alla data corrente')
-          this.menu.set(JSON.parse(localStorage.getItem('menu')!) as DailyMenu)
+          this.menu.set(JSON.parse(localStorage.getItem('menu') ?? ''))
           this.loading.set(false)
           this.error.set(false)
+
         } else {
           console.log('Menù non aggiornato')
           this.menu.set(null)
@@ -125,6 +131,36 @@ export class MenuComponent implements OnInit {
 
     const index = (date.getDay() + 6) % 7; // shift so Monday=0
     return giorni[index];
+  }
+
+  private createMenu() {
+    this.coursesCreator = [
+      {
+        title: 'Primi',
+        icon: '🍝',
+        dishes: this.menu()?.primi_piatti!
+      },
+      {
+        title: 'Secondi',
+        icon: '🍖',
+        dishes: this.menu()?.secondi_piatti!
+      },
+      {
+        title: 'Contorni',
+        icon: '🥗',
+        dishes: this.menu()?.contorni!
+      },
+      {
+        title: 'Piatto dello Chef',
+        icon: '⭐',
+        dishes: [this.menu()?.piatto_dello_chef!]
+      },
+      {
+        title: 'Alternative Variabili',
+        icon: '🧀',
+        dishes: this.menu()?.alternative_variabili!
+      }
+    ]
   }
 
 }

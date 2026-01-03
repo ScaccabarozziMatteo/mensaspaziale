@@ -22,8 +22,8 @@
     <div class="menuBody">
       @if(weekend()) {
       <div class="menu-section" style="padding: 2cap;">
-        <h2 class="dish-name" >È tempo di godersi il weekend</h2>
-        <h3 class="dish-name" >Ci vediamo lunedì!</h3>
+        <h2 class="dish-name">È tempo di godersi il weekend</h2>
+        <h3 class="dish-name">Ci vediamo lunedì!</h3>
         <img style="display: block; margin-left: auto; margin-right: auto; max-width: 80%;" src="/data/moon.gif" />
       </div>
       }
@@ -40,156 +40,20 @@
       <div class="menu-section" style="padding: 2cap;">
         <h2 class="dish-name" style="font-weight: 600;">Impossibile caricare il menu</h2>
         <h3 class="dish-name" style="margin-bottom: 0;">Il menù di oggi si è perso tra Saturno e Marte.</h3>
-        <h3 class="dish-name" style="margin-top: 0.6rem;">Riprova a breve, il modulo pranzo è in fase di rientro. 🚀🥗</h3>
+        <h3 class="dish-name" style="margin-top: 0.6rem;">Riprova a breve, il modulo pranzo è in fase di rientro. 🚀🥗
+        </h3>
       </div>
 
       }
       @else {
 
-      <!-- IMPLEMENT THIS COMPONENT 
-      <menu-section />
-      -->
-
-      <div class="menuContainer">
-        <div class="menu-section">
-          <div class="section-header">
-            <div class="section-title-group">
-              <span class="section-icon">🍝</span>
-              <h2 class="section-title">Primi</h2>
-            </div>
-          </div>
-          <div class="dishes-grid">
-            @for (dish of menu()?.primi_piatti; track $index) {
-            <div class="dish-item">
-              <div class="dish-header">
-                <div class="dish-name">
-                  <p>{{ dish }}</p>
-                  <div class="dish-info">
-                    <!--
-                    <span class="tag vegetarian">🌱</span>
-                       tag === 'vegan' ? '🌿 Vegano' :
-                      tag === 'fish' ? '🐟 Pesce' : '🍖 Carne'} -->
-                  </div>
-                </div>
-              </div>
-            </div>
-            }
-          </div>
-        </div>
-      </div>
-
-      <div class="menuContainer">
-        <div class="menu-section">
-          <div class="section-header">
-            <div class="section-title-group">
-              <span class="section-icon">🍖</span>
-              <h2 class="section-title">Secondi</h2>
-            </div>
-          </div>
-          <div class="dishes-grid">
-            @for (dish of menu()?.secondi_piatti; track $index) {
-            <div class="dish-item">
-              <div class="dish-header">
-                <div class="dish-name">
-                  <p>{{ dish }}</p>
-                  <div class="dish-info">
-                    <!--
-                    <span class="tag vegetarian">🌱</span>
-                       tag === 'vegan' ? '🌿 Vegano' :
-                      tag === 'fish' ? '🐟 Pesce' : '🍖 Carne'} -->
-                  </div>
-                </div>
-              </div>
-            </div>
-            }
-          </div>
-        </div>
-      </div>
-
-      <div class="menuContainer">
-        <div class="menu-section">
-          <div class="section-header">
-            <div class="section-title-group">
-              <span class="section-icon">🥗</span>
-              <h2 class="section-title">Contorni</h2>
-            </div>
-          </div>
-          <div class="dishes-grid">
-            @for (dish of menu()?.contorni; track $index) {
-            <div class="dish-item">
-              <div class="dish-header">
-                <div class="dish-name">
-                  <p>{{ dish }}</p>
-                  <div class="dish-info">
-                    <!--
-                    <span class="tag vegetarian">🌱</span>
-                       tag === 'vegan' ? '🌿 Vegano' :
-                      tag === 'fish' ? '🐟 Pesce' : '🍖 Carne'} -->
-                  </div>
-                </div>
-              </div>
-            </div>
-            }
-          </div>
-        </div>
-      </div>
-
-      <div class="menuContainer">
-        <div class="menu-section">
-          <div class="section-header">
-            <div class="section-title-group">
-              <span class="section-icon">⭐</span>
-              <h2 class="section-title">Piatto dello Chef</h2>
-            </div>
-          </div>
-          <div class="dishes-grid">
-            <div class="dish-item">
-              <div class="dish-header">
-                <div class="dish-name">
-                  <p>{{ menu()?.piatto_dello_chef }}</p>
-                  <div class="dish-info">
-                    <!--
-                    <span class="tag vegetarian">🌱</span>
-                       tag === 'vegan' ? '🌿 Vegano' :
-                      tag === 'fish' ? '🐟 Pesce' : '🍖 Carne'} -->
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-      <div class="menuContainer">
-        <div class="menu-section">
-          <div class="section-header">
-            <div class="section-title-group">
-              <span class="section-icon">🧀</span>
-              <h2 class="section-title">Alternative Variabili</h2>
-            </div>
-          </div>
-          <div class="dishes-grid">
-            @for (dish of menu()?.alternative_variabili; track $index) {
-            <div class="dish-item">
-              <div class="dish-header">
-                <div class="dish-name">
-                  <p>{{ dish }}</p>
-                  <div class="dish-info">
-                    <!--
-                    <span class="tag vegetarian">🌱</span>
-                       tag === 'vegan' ? '🌿 Vegano' :
-                      tag === 'fish' ? '🐟 Pesce' : '🍖 Carne'} -->
-                  </div>
-                </div>
-              </div>
-            </div>
-            }
-          </div>
-        </div>
-      </div>
+      <!-- IMPLEMENT THIS COMPONENT -->
+      @for(course of coursesCreator; track $index) {
+      <menu-section [icon]="course.icon" [dishes]="course.dishes" [title]="course.title" />
+      }
 
       }
+
     </div>
     <footer>
       <p>Progetto indipendente, il menù è puramente indicativo.</p>
