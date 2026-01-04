@@ -22,7 +22,18 @@ export class MenuComponent implements OnInit {
   menuWeekNumber = 0;
   private dayOfWeekNumber = 0;
 
-  coursesCreator!: { title: string; icon: string; dishes: string[]; }[];
+  private num_primi =  signal(0);
+  private num_secondi = signal(0);
+  private num_contorni = signal(0);
+
+  coursesCreator!: {
+    fish_label: boolean[],
+    meat_label: boolean[],
+    vegetarian_label: boolean[],
+    title: string,
+    icon: string,
+    dishes: string[];
+  }[];
 
   private appwrite = inject(AppwriteService)
 
@@ -41,7 +52,6 @@ export class MenuComponent implements OnInit {
 
     if (!this.weekend()) {
       this.loadMenu();
-      this.createMenu();
     }
   }
 
@@ -57,6 +67,8 @@ export class MenuComponent implements OnInit {
         if (menuDate === today) {
           console.log('Menù aggiornato alla data corrente')
           this.menu.set(JSON.parse(localStorage.getItem('menu') ?? ''))
+          this.defineQuantityCourses();
+          this.createMenu();
           this.loading.set(false)
           this.error.set(false)
 
@@ -73,6 +85,8 @@ export class MenuComponent implements OnInit {
           this.loading.set(false)
         }).then(value => {
           this.menu.set(value);
+          this.defineQuantityCourses();
+          this.createMenu();
           if (value !== undefined) {
             localStorage.setItem('menu', JSON.stringify(this.menu()))
             this.loading.set(false)
@@ -133,32 +147,53 @@ export class MenuComponent implements OnInit {
     return giorni[index];
   }
 
+  private defineQuantityCourses() {
+    this.num_primi.set(this.menu()?.primi_piatti.length!);
+    this.num_secondi.set(this.menu()?.secondi_piatti.length!);
+    this.num_contorni.set(this.menu()?.contorni.length!);
+  }
+
   private createMenu() {
     this.coursesCreator = [
       {
         title: 'Primi',
         icon: '🍝',
-        dishes: this.menu()?.primi_piatti!
+        dishes: this.menu()?.primi_piatti!,
+        meat_label: this.menu()?.meat_label!.slice(0, this.num_primi())!,
+        fish_label: this.menu()?.fish_label!.slice(0, this.num_primi())!,
+        vegetarian_label: this.menu()?.vegetarian_label!.slice(0, this.num_primi())!
       },
       {
         title: 'Secondi',
         icon: '🍖',
-        dishes: this.menu()?.secondi_piatti!
+        dishes: this.menu()?.secondi_piatti!,
+        meat_label: this.menu()?.meat_label!.slice(this.num_primi(), this.num_primi() + this.num_secondi())!,
+        fish_label: this.menu()?.fish_label!.slice(this.num_primi(), this.num_primi() + this.num_secondi())!,
+        vegetarian_label: this.menu()?.vegetarian_label!.slice(this.num_primi(), this.num_primi() + this.num_secondi())!
       },
       {
         title: 'Contorni',
         icon: '🥗',
-        dishes: this.menu()?.contorni!
+        dishes: this.menu()?.contorni!,
+        meat_label: this.menu()?.meat_label!.slice(this.num_primi() + this.num_secondi(), this.num_primi() + this.num_secondi() + this.num_contorni())!,
+        fish_label: this.menu()?.fish_label!.slice(this.num_primi() + this.num_secondi(), this.num_primi() + this.num_secondi() + this.num_contorni())!,
+        vegetarian_label: this.menu()?.vegetarian_label!.slice(this.num_primi() + this.num_secondi(), this.num_primi() + this.num_secondi() + this.num_contorni())!
       },
       {
         title: 'Piatto dello Chef',
         icon: '⭐',
-        dishes: [this.menu()?.piatto_dello_chef!]
+        dishes: [this.menu()?.piatto_dello_chef!],
+        meat_label: this.menu()?.meat_label!.slice(this.num_primi() + this.num_secondi() + this.num_contorni(), this.num_primi() + this.num_secondi() + this.num_contorni() + 1)!,
+        fish_label: this.menu()?.fish_label!.slice(this.num_primi() + this.num_secondi()+ this.num_contorni(), this.num_primi() + this.num_secondi() + this.num_contorni() + 1)!,
+        vegetarian_label: this.menu()?.vegetarian_label!.slice(this.num_primi() + this.num_secondi() + this.num_contorni(), this.num_primi() + this.num_secondi() + this.num_contorni() + 1)!
       },
       {
         title: 'Alternative Variabili',
         icon: '🧀',
-        dishes: this.menu()?.alternative_variabili!
+        dishes: this.menu()?.alternative_variabili!,
+        meat_label: this.menu()?.meat_label!.slice(this.num_primi() + this.num_secondi() + this.num_contorni() + 1)!,
+        fish_label: this.menu()?.fish_label!.slice(this.num_primi() + this.num_secondi() + this.num_contorni() + 1)!,
+        vegetarian_label: this.menu()?.vegetarian_label!.slice(this.num_primi()+ this.num_secondi() + this.num_contorni() + 1)!
       },
       {
         title: 'Dessert',
@@ -169,7 +204,10 @@ export class MenuComponent implements OnInit {
           'Snack dolce',
           'Yogurt',
           'Budino vaniglia o cioccolato'
-        ]
+        ],
+        meat_label: [false, false, false, false, false],
+        fish_label: [false, false, false, false, false],
+        vegetarian_label: [false, false, false, false, false]
       }
     ]
   }

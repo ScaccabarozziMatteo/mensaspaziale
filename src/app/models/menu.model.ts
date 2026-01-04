@@ -8,6 +8,9 @@ export class DailyMenu {
     public piatto_dello_chef: string,
     public contorni: string[],
     public alternative_variabili: string[],
-    public date: string
+    public date: string,
+    public meat_label: boolean[],
+    public fish_label: boolean[],
+    public vegetarian_label: boolean[]
   ) {}
 }
