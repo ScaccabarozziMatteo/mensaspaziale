@@ -14,13 +14,13 @@
           <div class="dish-name">
             <p>{{ dish }}</p>
 
-            @if (meat_label && fish_label && title !== 'Dessert' ? !meat_label[$index] && !fish_label[$index] : false) {
+            @if ((meat_label !== undefined && fish_label !== undefined && title !== 'Dessert') ? !meat_label[$index] && !fish_label[$index] : false) {
               <span class="tag vegetarian">🌱</span>
             }
-            @if (meat_label ? meat_label[$index] : false) {
+            @if (meat_label !== undefined ? meat_label[$index] : false) {
               <span class="tag meat">🍖</span>
             }
-            @if (fish_label ? fish_label[$index] : false) {
+            @if (fish_label !== undefined ? fish_label[$index] : false) {
               <span class="tag fish">🐟</span>
             }
             
