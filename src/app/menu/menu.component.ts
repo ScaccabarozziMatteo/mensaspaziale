@@ -21,6 +21,7 @@ export class MenuComponent implements OnInit {
   weekend = signal(false);
   menuWeekNumber = 0;
   private dayOfWeekNumber = 0;
+  private weekNumberOffset = 2;
 
   private num_primi =  signal(0);
   private num_secondi = signal(0);
@@ -103,12 +104,11 @@ export class MenuComponent implements OnInit {
 
   getWeekNumber(date: Date = new Date()): number {
     const currentDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-    // Set to nearest Thursday: current date + 4 - current day number
     const dayNum = currentDate.getUTCDay() || 7;
     currentDate.setUTCDate(currentDate.getUTCDate() + 4 - dayNum);
     // Get first day of year
     const yearStart = new Date(Date.UTC(currentDate.getUTCFullYear(), 0, 1));
-    // Calculate full weeks to nearest Thursday
+    
     const weekNo = Math.ceil(((currentDate.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
 
     return weekNo;
@@ -119,7 +119,7 @@ export class MenuComponent implements OnInit {
   }
 
   getMenuWeekNumber() {
-    this.menuWeekNumber = ((this.getWeekNumber() + 3) % 4)
+    this.menuWeekNumber = ((this.getWeekNumber() + this.weekNumberOffset) % 4)
   }
 
   getDayOfWeek(date: Date = new Date()): number {
