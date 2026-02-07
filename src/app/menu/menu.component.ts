@@ -42,8 +42,8 @@ export class MenuComponent implements OnInit {
     this.dayOfWeekNumber = this.getDayOfWeek()
     this.italianDayName.set(this.getItalianDayName())
 
-    console.log("Menù week number: " + this.menuWeekNumber)
-    console.log("Day of week number: " + this.dayOfWeekNumber)
+    // console.log("Menù week number: " + this.menuWeekNumber)
+    // console.log("Day of week number: " + this.dayOfWeekNumber)
 
     // Check if today is a weekend day
     this.handleWeekend()
