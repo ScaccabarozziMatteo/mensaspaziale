@@ -12,9 +12,8 @@
         <h1>MENSA SPAZIALE</h1>
         <span class="title-emoji">🚀</span>
       </div>
-      <p class="subtitle">Progetto in fase beta</p>
       <div class="date-badge">
-        📅 {{ italianDayName() }} - Settimana {{menuWeekNumber + 1 }}
+        📅 {{ italianDayName() }} - Menù Invernale
       </div>
     </header>
 
@@ -39,9 +38,7 @@
       @else if(error()) {
       <div class="menu-section" style="padding: 2cap;">
         <h2 class="dish-name" style="font-weight: 600;">Impossibile caricare il menu</h2>
-        <h3 class="dish-name" style="margin-bottom: 0;">Il menù di oggi si è perso tra Saturno e Marte.</h3>
-        <h3 class="dish-name" style="margin-top: 0.6rem;">Riprova a breve, il modulo pranzo è in fase di rientro. 🚀🥗
-        </h3>
+        <h3 class="dish-name" style="margin-top: 0.6rem;">Controlla la connessione a internet e prova a ricaricare la pagina!</h3>
       </div>
 
       }
