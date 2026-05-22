@@ -193,7 +193,9 @@ export class MenuComponent implements OnInit {
         title: 'Dessert',
         icon: '🍰',
         dishes: [
+          'Gelato',
           'Frutta di stagione',
+          'Frutta secca',
           'Polpa di frutta',
           'Snack dolce',
           'Yogurt',

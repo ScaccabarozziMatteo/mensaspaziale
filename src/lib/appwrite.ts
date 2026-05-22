@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Client, TablesDB, Query } from 'appwrite';
 import { DailyMenu } from '../app/models/menu.model';
+import { projectId, endpoint, tablesDB, tables } from '../../appwrite.config.json'
 
 @Injectable({
   providedIn: 'root'
@@ -9,13 +10,13 @@ export class AppwriteService {
   private client = new Client();
   private tablesDB: TablesDB;
 
-  private databaseID = "68fc9c4a00261282e43d"
-  private menu_collection_ID = "week1"
+  private databaseID = tablesDB[0].$id;
+  private menu_collection_ID = tables[1].$id;
 
   constructor() {
     this.client
-      .setEndpoint('https://fra.cloud.appwrite.io/v1')
-      .setProject('68fc98fb001d33ecc5b5');
+      .setEndpoint(endpoint)
+      .setProject(projectId);
 
     this.tablesDB = new TablesDB(this.client);
   }
