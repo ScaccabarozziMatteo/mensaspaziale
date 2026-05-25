@@ -175,19 +175,19 @@ export class MenuComponent implements OnInit {
         meat_label: this.menu()?.meat_label!.slice(this.num_primi() + this.num_secondi(), this.num_primi() + this.num_secondi() + this.num_contorni())!,
         fish_label: this.menu()?.fish_label!.slice(this.num_primi() + this.num_secondi(), this.num_primi() + this.num_secondi() + this.num_contorni())!,
       },
-      {
-        title: 'Piatto dello Chef',
-        icon: '⭐',
-        dishes: [this.menu()?.piatto_dello_chef!],
-        meat_label: this.menu()?.meat_label!.slice(this.num_primi() + this.num_secondi() + this.num_contorni(), this.num_primi() + this.num_secondi() + this.num_contorni() + 1)!,
-        fish_label: this.menu()?.fish_label!.slice(this.num_primi() + this.num_secondi()+ this.num_contorni(), this.num_primi() + this.num_secondi() + this.num_contorni() + 1)!,
-      },
+      // {
+      //   title: 'Piatto dello Chef',
+      //   icon: '⭐',
+      //   dishes: [this.menu()?.piatto_dello_chef!],
+      //   meat_label: this.menu()?.meat_label!.slice(this.num_primi() + this.num_secondi() + this.num_contorni(), this.num_primi() + this.num_secondi() + this.num_contorni() + 1)!,
+      //   fish_label: this.menu()?.fish_label!.slice(this.num_primi() + this.num_secondi()+ this.num_contorni(), this.num_primi() + this.num_secondi() + this.num_contorni() + 1)!,
+      // },
       {
         title: 'Alternative Variabili',
         icon: '🧀',
         dishes: this.menu()?.alternative_variabili!,
-        meat_label: this.menu()?.meat_label!.slice(this.num_primi() + this.num_secondi() + this.num_contorni() + 1)!,
-        fish_label: this.menu()?.fish_label!.slice(this.num_primi() + this.num_secondi() + this.num_contorni() + 1)!,
+        meat_label: this.menu()?.meat_label!.slice(this.num_primi() + this.num_secondi() + this.num_contorni())!,
+        fish_label: this.menu()?.fish_label!.slice(this.num_primi() + this.num_secondi() + this.num_contorni())!,
       },
       {
         title: 'Dessert',
