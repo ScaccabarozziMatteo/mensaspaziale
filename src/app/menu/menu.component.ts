@@ -183,7 +183,7 @@ export class MenuComponent implements OnInit {
       //   fish_label: this.menu()?.fish_label!.slice(this.num_primi() + this.num_secondi()+ this.num_contorni(), this.num_primi() + this.num_secondi() + this.num_contorni() + 1)!,
       // },
       {
-        title: 'Alternative Variabili',
+        title: 'Alternative al Secondo',
         icon: '🧀',
         dishes: this.menu()?.alternative_variabili!,
         meat_label: this.menu()?.meat_label!.slice(this.num_primi() + this.num_secondi() + this.num_contorni())!,
