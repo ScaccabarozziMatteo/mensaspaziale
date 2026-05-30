@@ -30,6 +30,7 @@ export class MenuComponent implements OnInit {
   coursesCreator!: {
     fish_label: boolean[],
     meat_label: boolean[],
+    vegan_label: boolean[],
     title: string,
     icon: string,
     dishes: string[];
@@ -79,7 +80,7 @@ export class MenuComponent implements OnInit {
       }
       if (this.menu() === null) {
         console.log('Menù non presente o non aggiornato, scaricamento menù aggiornato in corso..')
-        this.appwrite.getMenu(this.menuWeekNumber, this.dayOfWeekNumber).catch(error => {
+        this.appwrite.getMenu(1, this.dayOfWeekNumber).catch(error => {
           console.error(error);
           this.error.set(true);
           this.loading.set(false)
@@ -160,6 +161,7 @@ export class MenuComponent implements OnInit {
         dishes: this.menu()?.primi_piatti!,
         meat_label: this.menu()?.meat_label!.slice(0, this.num_primi())!,
         fish_label: this.menu()?.fish_label!.slice(0, this.num_primi())!,
+        vegan_label: this.menu()?.vegan_label!.slice(0, this.num_primi())!,
       },
       {
         title: 'Secondi',
@@ -167,6 +169,7 @@ export class MenuComponent implements OnInit {
         dishes: this.menu()?.secondi_piatti!,
         meat_label: this.menu()?.meat_label!.slice(this.num_primi(), this.num_primi() + this.num_secondi())!,
         fish_label: this.menu()?.fish_label!.slice(this.num_primi(), this.num_primi() + this.num_secondi())!,
+        vegan_label: this.menu()?.vegan_label!.slice(this.num_primi(), this.num_primi() + this.num_secondi())!,
       },
       {
         title: 'Contorni',
@@ -174,6 +177,7 @@ export class MenuComponent implements OnInit {
         dishes: this.menu()?.contorni!,
         meat_label: this.menu()?.meat_label!.slice(this.num_primi() + this.num_secondi(), this.num_primi() + this.num_secondi() + this.num_contorni())!,
         fish_label: this.menu()?.fish_label!.slice(this.num_primi() + this.num_secondi(), this.num_primi() + this.num_secondi() + this.num_contorni())!,
+        vegan_label: this.menu()?.vegan_label!.slice(this.num_primi() + this.num_secondi(), this.num_primi() + this.num_secondi() + this.num_contorni())!,
       },
       // {
       //   title: 'Piatto dello Chef',
@@ -181,6 +185,7 @@ export class MenuComponent implements OnInit {
       //   dishes: [this.menu()?.piatto_dello_chef!],
       //   meat_label: this.menu()?.meat_label!.slice(this.num_primi() + this.num_secondi() + this.num_contorni(), this.num_primi() + this.num_secondi() + this.num_contorni() + 1)!,
       //   fish_label: this.menu()?.fish_label!.slice(this.num_primi() + this.num_secondi()+ this.num_contorni(), this.num_primi() + this.num_secondi() + this.num_contorni() + 1)!,
+      //   vegan_label: this.menu()?.vegan_label!.slice(this.num_primi() + this.num_secondi()+ this.num_contorni(), this.num_primi() + this.num_secondi() + this.num_contorni() + 1)!,
       // },
       {
         title: 'Alternative al Secondo',
@@ -188,6 +193,7 @@ export class MenuComponent implements OnInit {
         dishes: this.menu()?.alternative_variabili!,
         meat_label: this.menu()?.meat_label!.slice(this.num_primi() + this.num_secondi() + this.num_contorni())!,
         fish_label: this.menu()?.fish_label!.slice(this.num_primi() + this.num_secondi() + this.num_contorni())!,
+        vegan_label: this.menu()?.vegan_label!.slice(this.num_primi() + this.num_secondi() + this.num_contorni())!,
       },
       {
         title: 'Dessert',
@@ -201,8 +207,9 @@ export class MenuComponent implements OnInit {
           'Yogurt',
           'Budino vaniglia o cioccolato'
         ],
-        meat_label: [false, false, false, false, false],
-        fish_label: [false, false, false, false, false],
+        meat_label: [false, false, false, false, false, false, false, false, false, false, false, false],
+        fish_label: [false, false, false, false, false, false, false, false, false, false, false, false],
+        vegan_label: [false, false, false, false, false, false, false, false, false, false, false, false],
       }
     ]
   }

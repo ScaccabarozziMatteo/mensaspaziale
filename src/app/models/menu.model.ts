@@ -11,6 +11,6 @@ export class DailyMenu {
     public date: string,
     public meat_label: boolean[],
     public fish_label: boolean[],
-    public vegetarian_label: boolean[]
+    public vegan_label: boolean[]
   ) {}
 }
