@@ -254,6 +254,7 @@ h1 {
 .legendBody {
   display: flex;
   gap: 30px;
+  row-gap: normal;
   flex-wrap: wrap;
   justify-content: center;
 }
