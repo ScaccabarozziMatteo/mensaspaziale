@@ -44,7 +44,6 @@
       }
       @else {
 
-      <!-- IMPLEMENT THIS COMPONENT -->
       @for(course of coursesCreator; track $index) {
       <menu-section [icon]="course.icon" [dishes]="course.dishes" [title]="course.title" [meat_label]="course.meat_label" [fish_label]="course.fish_label" [vegan_label]="course.vegan_label"/>
       }
@@ -52,6 +51,17 @@
       }
 
     </div>
+
+    <!-- Legend section -->
+      <h3 class="legendTitle">Legenda</h3>
+      <div class="legendBody">
+        <p><span class="tag meat">🍖</span> Carne</p>
+        <p><span class="tag fish">🐟</span> Pesce</p>
+        <p><span class="tag vegetarian">🥕</span> Vegetariano</p>
+        <p><span class="tag vegan">🌱</span> Vegano (dichiarato dal menù)</p>
+      </div>
+      
+    <!-- Footer section -->
     <footer>
       <p>Progetto indipendente, il menù è puramente indicativo.</p>
       <a href="https://github.com/ScaccabarozziMatteo/mensaspaziale" target="_blank" rel="noopener noreferrer"
