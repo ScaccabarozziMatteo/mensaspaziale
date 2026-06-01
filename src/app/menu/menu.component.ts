@@ -100,6 +100,8 @@ export class MenuComponent implements OnInit {
       console.error('Error fetching menu:', err);
       this.loading.set(false)
       this.error.set(true)
+      // Clean storage cache
+      localStorage.clear()
     }
   }
 
