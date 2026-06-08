@@ -21,7 +21,7 @@ export class MenuComponent implements OnInit {
   weekend = signal(false);
   menuWeekNumber = 0;
   private dayOfWeekNumber = 0;
-  private weekNumberOffset = 2;
+  private weekNumberOffset = 3;
 
   private num_primi =  signal(0);
   private num_secondi = signal(0);
