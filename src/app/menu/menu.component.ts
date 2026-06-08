@@ -21,7 +21,7 @@ export class MenuComponent implements OnInit {
   weekend = signal(false);
   menuWeekNumber = 0;
   private dayOfWeekNumber = 0;
-  private weekNumberOffset = 3;
+  private weekNumberOffset = 2;
 
   private num_primi =  signal(0);
   private num_secondi = signal(0);
@@ -80,7 +80,7 @@ export class MenuComponent implements OnInit {
       }
       if (this.menu() === null) {
         console.log('Menù non presente o non aggiornato, scaricamento menù aggiornato in corso..')
-        this.appwrite.getMenu(1, this.dayOfWeekNumber).catch(error => {
+        this.appwrite.getMenu(this.menuWeekNumber, this.dayOfWeekNumber).catch(error => {
           console.error(error);
           this.error.set(true);
           this.loading.set(false)
