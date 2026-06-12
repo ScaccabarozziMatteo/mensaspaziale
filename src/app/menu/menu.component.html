@@ -17,8 +17,17 @@
       </div>
     </header>
 
+     @if (!isMobile()) {
+        <button class="nav left" (click)="previousDay()">‹</button>
+        <button class="nav right" (click)="nextDay()">›</button>
+      }
+
     <!--BODY-->
-    <div class="menuBody">
+    <div class="menuBody"
+    (pointerdown)="onPointerDown($event)"
+    (pointerup)="onPointerUp($event)"
+    >
+   
       @if(weekend()) {
       <div class="menu-section" style="padding: 2cap;">
         <h2 class="dish-name">È tempo di godersi il weekend</h2>

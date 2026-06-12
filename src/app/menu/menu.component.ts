@@ -19,6 +19,10 @@ export class MenuComponent implements OnInit {
   loading = signal(true);
   error = signal(false);
   weekend = signal(false);
+
+  dayOffset = signal(0);
+  displayDate = signal(new Date());
+    
   menuWeekNumber = 0;
   private dayOfWeekNumber = 0;
   private weekNumberOffset = 2;
@@ -26,6 +30,13 @@ export class MenuComponent implements OnInit {
   private num_primi =  signal(0);
   private num_secondi = signal(0);
   private num_contorni = signal(0);
+
+  private startX = 0;
+  private startY = 0;
+  private tracking = false;
+
+  isMobile = signal(window.innerWidth <= 768);
+
 
   coursesCreator!: {
     fish_label: boolean[],
@@ -39,26 +50,64 @@ export class MenuComponent implements OnInit {
   private appwrite = inject(AppwriteService)
 
   ngOnInit(): void {
-    this.menuWeekNumber = this.getWeekNumber()
-    this.dayOfWeekNumber = this.getDayOfWeek()
-    this.italianDayName.set(this.getItalianDayName())
+    this.updateDisplayDate();
+
+      window.addEventListener('resize', () => {
+    this.isMobile.set(window.innerWidth <= 768);
+  });
 
     // console.log("Menù week number: " + this.menuWeekNumber)
     // console.log("Day of week number: " + this.dayOfWeekNumber)
-
-    // Check if today is a weekend day
-    this.handleWeekend()
-
-    this.getMenuWeekNumber()
-
-    if (!this.weekend()) {
-      this.loadMenu();
-    }
   }
+
+private updateDisplayDate() {
+  const date = new Date();
+  date.setDate(date.getDate() + this.dayOffset()); // usa sempre dayOffset
+
+  this.displayDate.set(date);
+  this.dayOfWeekNumber = this.getDayOfWeek(date);
+  this.italianDayName.set(this.getItalianDayName(date));
+  this.menuWeekNumber = this.getWeekNumber(date);
+  this.getMenuWeekNumber();
+  this.handleWeekend();
+
+  console.log('dayOffset:', this.dayOffset(), '| dayOfWeek:', this.dayOfWeekNumber, '| menuWeek:', this.menuWeekNumber);
+
+  if (!this.weekend()) {
+    this.loadMenu();
+  }
+}
+
+nextDay() {
+  const nextOffset = this.dayOffset() + 1;
+  const futureDate = new Date();
+  futureDate.setDate(futureDate.getDate() + nextOffset);
+
+  if (this.getDayOfWeek(futureDate) > 4) {
+    return; // no weekend
+  }
+
+  this.dayOffset.set(nextOffset);
+  this.loading.set(true);
+  this.menu.set(null);
+  this.updateDisplayDate();
+}
+
+previousDay() {
+  if (this.dayOfWeekNumber <= 0) {
+    return;
+  }
+
+  this.dayOffset.update(v => v - 1);
+  this.loading.set(true);
+  this.menu.set(null);
+  this.updateDisplayDate();
+}
 
   async loadMenu() {
     try {
-      const cachedMenu = localStorage.getItem('menu')
+      const cacheKey = `menu-${this.menuWeekNumber}-${this.dayOfWeekNumber}`;
+      const cachedMenu = localStorage.getItem(cacheKey)
 
       if (cachedMenu !== undefined && cachedMenu !== null) {
         console.log('Menù presente in cache')
@@ -67,7 +116,7 @@ export class MenuComponent implements OnInit {
 
         if (menuDate === today) {
           console.log('Menù aggiornato alla data corrente')
-          this.menu.set(JSON.parse(localStorage.getItem('menu') ?? ''))
+          this.menu.set(JSON.parse(localStorage.getItem(cacheKey) ?? ''))
           this.defineQuantityCourses();
           this.createMenu();
           this.loading.set(false)
@@ -89,7 +138,10 @@ export class MenuComponent implements OnInit {
           this.defineQuantityCourses();
           this.createMenu();
           if (value !== undefined) {
-            localStorage.setItem('menu', JSON.stringify(this.menu()))
+            localStorage.setItem(
+              cacheKey,
+              JSON.stringify(this.menu())
+            );
             this.loading.set(false)
             this.error.set(false)
           }
@@ -121,9 +173,9 @@ export class MenuComponent implements OnInit {
     this.weekend.set(this.dayOfWeekNumber > 4)
   }
 
-  getMenuWeekNumber() {
-    this.menuWeekNumber = ((this.getWeekNumber() + this.weekNumberOffset) % 4)
-  }
+getMenuWeekNumber() {
+  this.menuWeekNumber = ((this.getWeekNumber(this.displayDate()) + this.weekNumberOffset) % 4)
+}
 
   getDayOfWeek(date: Date = new Date()): number {
     // JS getDay() returns: Sunday=0, Monday=1, ... Saturday=6
@@ -154,6 +206,30 @@ export class MenuComponent implements OnInit {
     this.num_secondi.set(this.menu()?.secondi_piatti.length!);
     this.num_contorni.set(this.menu()?.contorni.length!);
   }
+
+onPointerDown(event: PointerEvent) {
+  this.startX = event.clientX;
+  this.startY = event.clientY;
+  this.tracking = true;
+}
+
+onPointerUp(event: PointerEvent) {
+  if (!this.tracking) return;
+  this.tracking = false;
+
+  const deltaX = event.clientX - this.startX;
+  const deltaY = event.clientY - this.startY;
+  const minDistance = 60; // un po' meno rigido su mobile
+
+  if (Math.abs(deltaY) > Math.abs(deltaX)) return; // scroll verticale
+  if (Math.abs(deltaX) < minDistance) return;
+
+  if (deltaX < 0) {
+    this.nextDay();
+  } else {
+    this.previousDay();
+  }
+}
 
   private createMenu() {
     this.coursesCreator = [

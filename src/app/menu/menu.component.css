@@ -111,6 +111,7 @@ h1 {
   flex-wrap: wrap;
   justify-content: center;
   padding-top: 25px;
+  touch-action: pan-y;
 }
 
 .dish-header {
@@ -335,4 +336,47 @@ footer {
 .mat-spinner-color::ng-deep circle {
   stroke: #dbeafe !important;
   justify-self: center;
+}
+
+@media (max-width: 768px) {
+  .nav {
+    display: none;
+  }
+}
+
+.nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 2rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.nav:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.nav.left {
+  left: 10px;
+}
+
+.nav.right {
+  right: 10px;
+}
+
+/* Disabilita visivamente quando non applicabile */
+.nav:disabled {
+  opacity: 0.3;
+  cursor: default;
 }
