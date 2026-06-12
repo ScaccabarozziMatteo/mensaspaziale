@@ -1,6 +1,6 @@
 {
   "name": "Mensa Spaziale",
-  "short_name": "mensaspaziale",
+  "short_name": "Mensa Spaziale",
   "display": "standalone",
   "scope": "./",
   "background_color": "#01081e",
