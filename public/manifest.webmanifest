@@ -3,8 +3,8 @@
   "short_name": "mensaspaziale",
   "display": "standalone",
   "scope": "./",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "background_color": "#01081e",
+  "theme_color": "#01081e",
   "start_url": "./",
   "icons": [
     {
