@@ -17,17 +17,15 @@
       </div>
     </header>
 
-     @if (!isMobile()) {
-        <button class="nav left" (click)="previousDay()">‹</button>
-        <button class="nav right" (click)="nextDay()">›</button>
-      }
+    @if (!isMobile()) {
+    <button class="nav left" (click)="previousDay()">‹</button>
+    <button class="nav right" (click)="nextDay()">›</button>
+    }
 
     <!--BODY-->
-    <div class="menuBody"
-    (pointerdown)="onPointerDown($event)"
-    (pointerup)="onPointerUp($event)"
-    >
-   
+    <div class="menuBody" (pointerdown)="onPointerDown($event)" (pointerup)="onPointerUp($event)"
+      [class.slide-out-left]="slideDirection() === 'left'" [class.slide-out-right]="slideDirection() === 'right'">
+
       @if(weekend()) {
       <div class="menu-section" style="padding: 2cap;">
         <h2 class="dish-name">È tempo di godersi il weekend</h2>
@@ -47,14 +45,16 @@
       @else if(error()) {
       <div class="menu-section" style="padding: 2cap;">
         <h2 class="dish-name" style="font-weight: 600;">Impossibile caricare il menu</h2>
-        <h3 class="dish-name" style="margin-top: 0.6rem;">Controlla la connessione a internet e prova a ricaricare la pagina!</h3>
+        <h3 class="dish-name" style="margin-top: 0.6rem;">Controlla la connessione a internet e prova a ricaricare la
+          pagina!</h3>
       </div>
 
       }
       @else {
 
       @for(course of coursesCreator; track $index) {
-      <menu-section [icon]="course.icon" [dishes]="course.dishes" [title]="course.title" [meat_label]="course.meat_label" [fish_label]="course.fish_label" [vegan_label]="course.vegan_label"/>
+      <menu-section [icon]="course.icon" [dishes]="course.dishes" [title]="course.title"
+        [meat_label]="course.meat_label" [fish_label]="course.fish_label" [vegan_label]="course.vegan_label" />
       }
 
       }
@@ -62,14 +62,14 @@
     </div>
 
     <!-- Legend section -->
-      <h3 class="legendTitle">Legenda</h3>
-      <div class="legendBody">
-        <p><span class="tag meat">🍖</span> Carne</p>
-        <p><span class="tag fish">🐟</span> Pesce</p>
-        <p><span class="tag vegetarian">🥕</span> Vegetariano</p>
-        <p><span class="tag vegan">🌱</span> Vegano (dichiarato dal menù)</p>
-      </div>
-      
+    <h3 class="legendTitle">Legenda</h3>
+    <div class="legendBody">
+      <p><span class="tag meat">🍖</span> Carne</p>
+      <p><span class="tag fish">🐟</span> Pesce</p>
+      <p><span class="tag vegetarian">🥕</span> Vegetariano</p>
+      <p><span class="tag vegan">🌱</span> Vegano (dichiarato dal menù)</p>
+    </div>
+
     <!-- Footer section -->
     <footer>
       <p>Progetto indipendente, il menù è puramente indicativo.</p>

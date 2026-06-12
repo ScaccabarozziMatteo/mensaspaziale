@@ -112,6 +112,7 @@ h1 {
   justify-content: center;
   padding-top: 25px;
   touch-action: pan-y;
+  transition: transform 1s ease, opacity 1s ease;
 }
 
 .dish-header {
@@ -379,4 +380,67 @@ footer {
 .nav:disabled {
   opacity: 0.3;
   cursor: default;
+}
+
+.swipe-hint {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 12px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  animation: fadeInUp 0.5s ease-out, fadeOut 0.5s ease-in 3.5s forwards;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.swipe-hint-arrows {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.4rem;
+}
+
+.swipe-hint-icon {
+  font-size: 1.6rem;
+  animation: swipeWiggle 1.2s ease-in-out infinite;
+}
+
+.arrow-left, .arrow-right {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.swipe-hint-text {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.5px;
+}
+
+@keyframes swipeWiggle {
+  0%, 100% { transform: translateX(0); }
+  25%       { transform: translateX(-8px); }
+  75%       { transform: translateX(8px); }
+}
+
+@keyframes fadeOut {
+  to { opacity: 0; pointer-events: none; }
+}
+.slide-out-left {
+  transform: translateX(-40px);
+  opacity: 0;
+}
+
+.slide-out-right {
+  transform: translateX(40px);
+  opacity: 0;
 }
