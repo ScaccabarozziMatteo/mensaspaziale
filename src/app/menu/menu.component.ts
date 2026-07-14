@@ -3,7 +3,6 @@ import { AppwriteService } from '../../lib/appwrite';
 import { DailyMenu } from '../models/menu.model';
 import { StarsDirective } from '../service/stars.directive';
 import { MenuSectionComponent } from './menu-elements/menu-section.component';
-
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
