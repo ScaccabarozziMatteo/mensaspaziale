@@ -23,7 +23,7 @@ export class MenuComponent implements OnInit {
   displayDate = signal(new Date());
 
   menuWeekNumber = 0;
-  private dayOfWeekNumber = 0;
+  dayOfWeekNumber = 0;
   private weekNumberOffset = 2;
 
   private num_primi = signal(0);
@@ -36,6 +36,7 @@ export class MenuComponent implements OnInit {
 
   isMobile = signal(window.innerWidth <= 768);
   slideDirection = signal<'left' | 'right' | null>(null);
+  showSwipeHint = signal(false);
 
   coursesCreator!: {
     fish_label: boolean[],
@@ -46,10 +47,16 @@ export class MenuComponent implements OnInit {
     dishes: string[];
   }[];
 
+  poke_ingredients = ['Ingredienti variabili'];
+
   private appwrite = inject(AppwriteService)
 
   ngOnInit(): void {
     this.updateDisplayDate();
+
+    if (this.isMobile() && !localStorage.getItem('swipe-hint-seen')) {
+      this.showSwipeHint.set(true);
+    }
 
     window.addEventListener('resize', () => {
       this.isMobile.set(window.innerWidth <= 768);
@@ -95,10 +102,12 @@ export class MenuComponent implements OnInit {
       return; // no weekend
     }
 
-    this.dayOffset.set(nextOffset);
-    this.loading.set(true);
-    this.menu.set(null);
-    this.updateDisplayDate();
+    this.triggerSlide('left', () => {
+      this.dayOffset.set(nextOffset);
+      this.loading.set(true);
+      this.menu.set(null);
+      this.updateDisplayDate();
+    });
   }
 
   previousDay() {
@@ -106,10 +115,12 @@ export class MenuComponent implements OnInit {
       return;
     }
 
-    this.dayOffset.update(v => v - 1);
-    this.loading.set(true);
-    this.menu.set(null);
-    this.updateDisplayDate();
+    this.triggerSlide('right', () => {
+      this.dayOffset.update(v => v - 1);
+      this.loading.set(true);
+      this.menu.set(null);
+      this.updateDisplayDate();
+    });
   }
 
   async loadMenu() {
@@ -216,9 +227,15 @@ export class MenuComponent implements OnInit {
   }
 
   onPointerDown(event: PointerEvent) {
+    this.dismissSwipeHint();
     this.startX = event.clientX;
     this.startY = event.clientY;
     this.tracking = true;
+  }
+
+  dismissSwipeHint() {
+    localStorage.setItem('swipe-hint-seen', 'true');
+    this.showSwipeHint.set(false);
   }
 
   onPointerUp(event: PointerEvent) {

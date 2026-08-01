@@ -10,7 +10,7 @@ export class MenuSectionComponent {
   @Input({ required: true }) title: string = '';
   @Input({ required: true }) icon: string = '';
 
-  @Input({ required: true }) meat_label: boolean[] = [false, false, false, false, false, false, false, false, false, false, false, false];
-  @Input({ required: true }) fish_label: boolean[] = [false, false, false, false, false, false, false, false,false, false, false, false];
-  @Input({ required: true }) vegan_label: boolean[] = [false, false, false, false, false, false, false, false,false, false, false, false];
+  @Input({ required: false }) meat_label: boolean[] = [false, false, false, false, false, false, false, false, false, false, false, false];
+  @Input({ required: false }) fish_label: boolean[] = [false, false, false, false, false, false, false, false,false, false, false, false];
+  @Input({ required: false }) vegan_label: boolean[] = [false, false, false, false, false, false, false, false,false, false, false, false];
 }

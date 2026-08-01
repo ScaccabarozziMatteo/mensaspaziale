@@ -1,5 +1,16 @@
 <div>
   <div class="stars" appStars [starCount]="100"></div>
+  @if (isMobile() && showSwipeHint()) {
+  <div class="swipe-hint" (click)="dismissSwipeHint()">
+    <div class="swipe-hint-arrows">
+      <span class="arrow-left">‹</span>
+      <span class="swipe-hint-icon">👆</span>
+      <span class="arrow-right">›</span>
+    </div>
+    <span class="swipe-hint-text">Scorri per cambiare giorno</span>
+  </div>
+  }
+
   <div class="container">
 
 
@@ -51,7 +62,10 @@
 
       }
       @else {
-
+  <!-- POKE -->
+   @if(dayOfWeekNumber === 3) {
+    <menu-section icon="🍚" [dishes]="poke_ingredients" title="Pokè" />
+    }
       @for(course of coursesCreator; track $index) {
       <menu-section [icon]="course.icon" [dishes]="course.dishes" [title]="course.title"
         [meat_label]="course.meat_label" [fish_label]="course.fish_label" [vegan_label]="course.vegan_label" />

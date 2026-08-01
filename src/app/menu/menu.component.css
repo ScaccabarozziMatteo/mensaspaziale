@@ -112,7 +112,7 @@ h1 {
   justify-content: center;
   padding-top: 25px;
   touch-action: pan-y;
-  transition: transform 1s ease, opacity 1s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .dish-header {
@@ -397,7 +397,7 @@ footer {
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  animation: fadeInUp 0.5s ease-out, fadeOut 0.5s ease-in 3.5s forwards;
+  animation: fadeInUpCentered 0.5s ease-out, fadeOut 0.5s ease-in 3.5s forwards;
   pointer-events: auto;
   cursor: pointer;
 }
@@ -435,12 +435,48 @@ footer {
 @keyframes fadeOut {
   to { opacity: 0; pointer-events: none; }
 }
+
+@keyframes fadeInUpCentered {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 .slide-out-left {
-  transform: translateX(-40px);
+  transform: translateX(-80px);
   opacity: 0;
 }
 
 .slide-out-right {
-  transform: translateX(40px);
+  transform: translateX(80px);
   opacity: 0;
 }
