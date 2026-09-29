@@ -5,11 +5,15 @@
 /tmp
 /out-tsc
 /bazel-out
+*.tsbuildinfo
 
 # Node
 /node_modules
-npm-debug.log
-yarn-error.log
+npm-debug.log*
+yarn-error.log*
+yarn-debug.log*
+pnpm-debug.log*
+.firebase/
 
 # IDEs and editors
 .idea/
@@ -19,26 +23,49 @@ yarn-error.log
 *.launch
 .settings/
 *.sublime-workspace
+*.swp
+*.swo
+*~
+.venv/
+venv/
 
 # Visual Studio Code
-.vscode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+# Local editor setup, not shared with the team.
+.vscode/
 .history/*
 
-# Miscellaneous
-/.angular/cache
-.sass-cache/
-/connect.lock
+# Local environment overrides
+# src/environment/environment.ts holds the shared, non-secret config that is
+# bundled into the app. Anything machine-specific or secret belongs in an
+# ignored *.local.ts sibling, wired up via fileReplacements in angular.json.
+src/environment/*.local.ts
+.env
+.env.*
+!.env.example
+
+# Test output
 /coverage
 /libpeerconnection.log
 testem.log
-/typings
 __screenshots__/
+/playwright-report/
+/test-results/
+
+# Logs
+*.log
+firebase-debug.log
+ui-debug.log
+
+# Caches
+/.angular/cache
+.sass-cache/
+/connect.lock
+/typings
 
 # System files
 .DS_Store
+._*
 Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/

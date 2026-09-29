@@ -38,6 +38,58 @@ body {
     }
 }
 
+/*
+ * Shooting stars.
+ *
+ * Each streak sits still and invisible for most of a long 20s cycle, then
+ * crosses the sky in the last ~10% of it. The delays below are negative and
+ * spread across the cycle, so the streaks are permanently out of phase and
+ * roughly one is visible every 5s without any JavaScript coordination.
+ */
+.shooting-star {
+    position: absolute;
+    width: 110px;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.9));
+    opacity: 0;
+    pointer-events: none;
+    will-change: transform, opacity;
+    animation: shootingStar 20s linear infinite;
+}
+
+@keyframes shootingStar {
+
+    0%,
+    88% {
+        opacity: 0;
+        transform: translate3d(0, 0, 0) rotate(20deg);
+    }
+
+    90% {
+        opacity: 1;
+        transform: translate3d(4vw, 3vh, 0) rotate(20deg);
+    }
+
+    94% {
+        opacity: 1;
+        transform: translate3d(20vw, 15vh, 0) rotate(20deg);
+    }
+
+    96%,
+    100% {
+        opacity: 0;
+        transform: translate3d(26vw, 20vh, 0) rotate(20deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .shooting-star {
+        animation: none;
+    }
+}
+
 @keyframes float {
 
     0%,

@@ -1,0 +1,218 @@
+/*
+ * Defined locally on purpose: the menu component's own keyframes are emitted
+ * scoped (_ngcontent-%COMP%_fadeInUp), so referencing them from here would
+ * not resolve.
+ */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.alternatives {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  margin-bottom: 20px;
+  max-width: 100%;
+  overflow: hidden;
+  animation: fadeInUp 0.6s ease-out backwards;
+}
+
+/* Collapsed header */
+
+.alternatives-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  transition: background 0.2s ease;
+}
+
+.alternatives-summary::-webkit-details-marker {
+  display: none;
+}
+
+.alternatives-summary:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.alternatives-summary:focus-visible {
+  outline: 2px solid #dbeafe;
+  outline-offset: -2px;
+}
+
+.alternatives-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.alternatives-title {
+  flex: 1 1 auto;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #dbeafe;
+}
+
+.alternatives-chevron {
+  flex: 0 0 auto;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.5);
+  transition: transform 0.25s ease;
+}
+
+.alternatives[open] .alternatives-chevron {
+  transform: rotate(90deg);
+}
+
+/* Body */
+
+.alternatives-body {
+  padding: 16px 20px 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.alternatives-intro {
+  margin: 0 0 16px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/*
+ * Mobile-first: one column, each block full width.
+ * The auto-fit track list promotes to 2+ columns as soon as there is room,
+ * so no breakpoint is needed to keep blocks readable on desktop.
+ */
+.alternatives-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+
+.alt-block {
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.alt-block-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin-bottom: 10px;
+}
+
+.alt-course {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #dbeafe;
+}
+
+.alt-pick {
+  margin-left: auto;
+  flex: 0 0 auto;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  color: #93c5fd;
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.alt-items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.alt-item {
+  position: relative;
+  padding-left: 15px;
+  font-weight: 300;
+  line-height: 1.4;
+  overflow-wrap: break-word;
+}
+
+.alt-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 7px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.alt-label {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.alt-detail {
+  display: block;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.alt-note {
+  margin: 0;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.alternatives-footnote {
+  margin: 16px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.8rem;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/*
+ * On wider screens the detail can sit beside the label instead of under it,
+ * so each option stays on a single line where there is room.
+ */
+@media (min-width: 480px) {
+  .alt-detail {
+    display: inline;
+    margin-left: 6px;
+  }
+
+  .alt-detail::before {
+    content: '· ';
+  }
+}
+
+@media (min-width: 900px) {
+  .alt-block {
+    padding: 16px 18px;
+  }
+
+  .alt-block-head {
+    margin-bottom: 12px;
+  }
+}
