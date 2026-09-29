@@ -1,18 +1,35 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Component, DestroyRef, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
+import { Renderer2 } from '@angular/core';
 import { AppwriteService } from '../../lib/appwrite';
 import { DailyMenu } from '../models/menu.model';
 import { StarsDirective } from '../service/stars.directive';
+import { MenuAlternativesComponent } from './menu-elements/menu-alternatives.component';
 import { MenuSectionComponent } from './menu-elements/menu-section.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+
+interface CourseSection {
+  title: string;
+  icon: string;
+  dishes: string[];
+  meat_label: boolean[];
+  fish_label: boolean[];
+  vegan_label: boolean[];
+}
 
 @Component({
   selector: 'app-menu',
   templateUrl: './menu.component.html',
   styleUrls: ['./menu.component.css'],
-  imports: [StarsDirective, MenuSectionComponent, MatProgressSpinnerModule]
+  imports: [StarsDirective, MenuSectionComponent, MenuAlternativesComponent, MatProgressSpinnerModule]
 
 })
 export class MenuComponent implements OnInit {
+  private readonly platformId = inject(PLATFORM_ID);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly renderer = inject(Renderer2);
+  private readonly appwrite = inject(AppwriteService);
+
   menu = signal<DailyMenu | null>(null);
   italianDayName = signal<string>('')
   loading = signal(true);
@@ -22,8 +39,8 @@ export class MenuComponent implements OnInit {
   dayOffset = signal(0);
   displayDate = signal(new Date());
 
-  menuWeekNumber = 0;
-  dayOfWeekNumber = 0;
+  readonly menuWeekNumber = signal(0);
+  readonly dayOfWeekNumber = signal(0);
   private weekNumberOffset = 0;
 
   private num_primi = signal(0);
@@ -34,37 +51,58 @@ export class MenuComponent implements OnInit {
   private startY = 0;
   private tracking = false;
 
-  isMobile = signal(window.innerWidth <= 768);
+  readonly isMobile = signal(false);
   slideDirection = signal<'left' | 'right' | null>(null);
   showSwipeHint = signal(false);
 
-  coursesCreator!: {
-    fish_label: boolean[],
-    meat_label: boolean[],
-    vegan_label: boolean[],
-    title: string,
-    icon: string,
-    dishes: string[];
-  }[];
+  readonly coursesCreator = signal<CourseSection[]>([]);
 
-  poke_ingredients = ['Ingredienti variabili'];
+  // Decorative streaks in the starfield. Negative delays spread across the 20s
+  // CSS cycle so they are permanently out of phase with each other.
+  readonly shootingStars = [
+    { top: '6%', left: '52%', delay: '0s' },
+    { top: '18%', left: '14%', delay: '-5s' },
+    { top: '4%', left: '78%', delay: '-10s' },
+    { top: '26%', left: '36%', delay: '-15s' }
+  ] as const;
 
-  private appwrite = inject(AppwriteService)
+  readonly poke_ingredients = ['Ingredienti variabili'];
+
+  constructor() {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    this.isMobile.set(window.innerWidth <= 768);
+
+    const unlisten = this.renderer.listen('window', 'resize', () => {
+      this.isMobile.set(window.innerWidth <= 768);
+    });
+    this.destroyRef.onDestroy(unlisten);
+  }
 
   ngOnInit(): void {
     this.updateDisplayDate();
 
-    if (this.isMobile() && !localStorage.getItem('swipe-hint-seen')) {
-      this.showSwipeHint.set(true);
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
     }
 
-    window.addEventListener('resize', () => {
-      this.isMobile.set(window.innerWidth <= 768);
+    if (this.isMobile() && !this.storage()?.getItem('swipe-hint-seen')) {
+      this.showSwipeHint.set(true);
+    }
+  }
 
-    });
+  private storage(): Storage | null {
+    if (!isPlatformBrowser(this.platformId)) {
+      return null;
+    }
 
-    // console.log("Menù week number: " + this.menuWeekNumber)
-    // console.log("Day of week number: " + this.dayOfWeekNumber)
+    try {
+      return window.localStorage;
+    } catch {
+      return null;
+    }
   }
 
   private triggerSlide(direction: 'left' | 'right', action: () => void) {
@@ -80,13 +118,10 @@ export class MenuComponent implements OnInit {
     date.setDate(date.getDate() + this.dayOffset()); // usa sempre dayOffset
 
     this.displayDate.set(date);
-    this.dayOfWeekNumber = this.getDayOfWeek(date);
+    this.dayOfWeekNumber.set(this.getDayOfWeek(date));
     this.italianDayName.set(this.getItalianDayName(date));
-    this.menuWeekNumber = this.getWeekNumber(date);
-    this.getMenuWeekNumber();
+    this.menuWeekNumber.set(this.getMenuWeekNumber());
     this.handleWeekend();
-
-    console.log('dayOffset:', this.dayOffset(), '| dayOfWeek:', this.dayOfWeekNumber, '| menuWeek:', this.menuWeekNumber);
 
     if (!this.weekend()) {
       this.loadMenu();
@@ -111,7 +146,7 @@ export class MenuComponent implements OnInit {
   }
 
   previousDay() {
-    if (this.dayOfWeekNumber <= 0) {
+    if (this.dayOfWeekNumber() <= 0) {
       return;
     }
 
@@ -124,18 +159,20 @@ export class MenuComponent implements OnInit {
   }
 
   async loadMenu() {
-    try {
-      const cacheKey = `menu-${this.menuWeekNumber}-${this.dayOfWeekNumber}`;
-      const cachedMenu = localStorage.getItem(cacheKey)
+    const storage = this.storage();
+    const cacheKey = `menu-${this.menuWeekNumber()}-${this.dayOfWeekNumber()}`;
 
-      if (cachedMenu !== undefined && cachedMenu !== null) {
+    try {
+      const cachedMenu = storage?.getItem(cacheKey);
+
+      if (cachedMenu !== null && cachedMenu !== undefined) {
         console.log('Menù presente in cache')
         const menuDate = JSON.parse(cachedMenu).date
         const today = new Date().toLocaleDateString()
 
         if (menuDate === today) {
           console.log('Menù aggiornato alla data corrente')
-          this.menu.set(JSON.parse(localStorage.getItem(cacheKey) ?? ''))
+          this.menu.set(JSON.parse(cachedMenu))
           this.defineQuantityCourses();
           this.createMenu();
           this.loading.set(false)
@@ -148,7 +185,7 @@ export class MenuComponent implements OnInit {
       }
       if (this.menu() === null) {
         console.log('Menù non presente o non aggiornato, scaricamento menù aggiornato in corso..')
-        this.appwrite.getMenu(this.menuWeekNumber, this.dayOfWeekNumber).catch(error => {
+        this.appwrite.getMenu(this.menuWeekNumber(), this.dayOfWeekNumber()).catch(error => {
           console.error(error);
           this.error.set(true);
           this.loading.set(false)
@@ -157,7 +194,7 @@ export class MenuComponent implements OnInit {
           this.defineQuantityCourses();
           this.createMenu();
           if (value !== undefined) {
-            localStorage.setItem(
+            storage?.setItem(
               cacheKey,
               JSON.stringify(this.menu())
             );
@@ -172,7 +209,7 @@ export class MenuComponent implements OnInit {
       this.loading.set(false)
       this.error.set(true)
       // Clean storage cache
-      localStorage.clear()
+      storage?.clear()
     }
   }
 
@@ -189,11 +226,11 @@ export class MenuComponent implements OnInit {
   }
 
   handleWeekend() {
-    this.weekend.set(this.dayOfWeekNumber > 4)
+    this.weekend.set(this.dayOfWeekNumber() > 4)
   }
 
-  getMenuWeekNumber() {
-    this.menuWeekNumber = ((this.getWeekNumber(this.displayDate()) + this.weekNumberOffset) % 4)
+  getMenuWeekNumber(): number {
+    return ((this.getWeekNumber(this.displayDate()) + this.weekNumberOffset) % 4)
   }
 
   getDayOfWeek(date: Date = new Date()): number {
@@ -234,7 +271,7 @@ export class MenuComponent implements OnInit {
   }
 
   dismissSwipeHint() {
-    localStorage.setItem('swipe-hint-seen', 'true');
+    this.storage()?.setItem('swipe-hint-seen', 'true');
     this.showSwipeHint.set(false);
   }
 
@@ -257,7 +294,7 @@ export class MenuComponent implements OnInit {
   }
 
   private createMenu() {
-    this.coursesCreator = [
+    this.coursesCreator.set([
       {
         title: 'Primi',
         icon: '🍝',
@@ -314,7 +351,7 @@ export class MenuComponent implements OnInit {
         fish_label: [false, false, false, false, false, false, false, false, false, false, false, false],
         vegan_label: [false, false, false, false, false, false, false, false, false, false, false, false],
       }
-    ]
+    ])
   }
 
 }

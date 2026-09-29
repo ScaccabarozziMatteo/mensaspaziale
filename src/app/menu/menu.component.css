@@ -105,7 +105,15 @@ h1 {
   min-width: fit-content;
 }
 
+.bodyStage {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .menuBody {
+  flex: 1 1 auto;
+  min-width: 0;
   display: flex;
   gap: 15px;
   flex-wrap: wrap;
@@ -256,9 +264,10 @@ h1 {
 .legendBody {
   display: flex;
   gap: 30px;
-  row-gap: normal;
+  row-gap: 10px;
   flex-wrap: wrap;
   justify-content: center;
+  margin-bottom: 28px;
 }
 
 
@@ -340,16 +349,14 @@ footer {
 }
 
 @media (max-width: 768px) {
-  .nav {
-    display: none;
+  /* I pulsanti sono gia' rimossi dal template via @if (!isMobile()). */
+  .bodyStage {
+    gap: 0;
   }
 }
 
 .nav {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 10;
+  flex: 0 0 auto;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: white;
@@ -366,14 +373,6 @@ footer {
 
 .nav:hover {
   background: rgba(255, 255, 255, 0.2);
-}
-
-.nav.left {
-  left: 10px;
-}
-
-.nav.right {
-  right: 10px;
 }
 
 /* Disabilita visivamente quando non applicabile */

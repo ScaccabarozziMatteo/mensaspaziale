@@ -1,0 +1,41 @@
+<details class="alternatives">
+  <summary class="alternatives-summary">
+    <span class="alternatives-icon" aria-hidden="true">🔄</span>
+    <span class="alternatives-title">GUIDA - Alternative ai piatti</span>
+    <span class="alternatives-chevron" aria-hidden="true">›</span>
+  </summary>
+
+  <div class="alternatives-body">
+    <p class="alternatives-intro">{{ intro }}</p>
+
+    <div class="alternatives-grid">
+      @for (rule of rules; track rule.course) {
+        <section class="alt-block">
+          <div class="alt-block-head">
+            <h3 class="alt-course">{{ rule.course }}</h3>
+            @if (rule.pick > 0) {
+            <span class="alt-pick">scegli 1 tra {{ rule.items.length }}</span>
+            }
+          </div>
+
+          @if (rule.note) {
+          <p class="alt-note">{{ rule.note }}</p>
+          } @else {
+          <ul class="alt-items">
+            @for (item of rule.items; track $index) {
+            <li class="alt-item">
+              <span class="alt-label">{{ item.label }}</span>
+              @if (item.detail) {
+              <span class="alt-detail">{{ item.detail }}</span>
+              }
+            </li>
+            }
+          </ul>
+          }
+        </section>
+      }
+    </div>
+
+    <p class="alternatives-footnote">{{ note }}</p>
+  </div>
+</details>
