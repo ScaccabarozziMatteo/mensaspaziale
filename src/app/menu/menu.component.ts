@@ -3,12 +3,16 @@ import { Component, DestroyRef, inject, OnInit, PLATFORM_ID, signal } from '@ang
 import { Renderer2 } from '@angular/core';
 import { AppwriteService } from '../../lib/appwrite';
 import { DailyMenu } from '../models/menu.model';
+import { AnalyticsService, DayNavMethod } from '../service/analyticsService';
 import { StarsDirective } from '../service/stars.directive';
 import { MenuAlternativesComponent } from './menu-elements/menu-alternatives.component';
 import { MenuSectionComponent } from './menu-elements/menu-section.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
+export type CourseId = 'primi' | 'secondi' | 'contorni' | 'dessert';
+
 interface CourseSection {
+  id: CourseId;
   title: string;
   icon: string;
   dishes: string[];
@@ -21,6 +25,7 @@ interface CourseSection {
   selector: 'app-menu',
   templateUrl: './menu.component.html',
   styleUrls: ['./menu.component.css'],
+  host: { display: 'block' },
   imports: [StarsDirective, MenuSectionComponent, MenuAlternativesComponent, MatProgressSpinnerModule]
 
 })
@@ -29,6 +34,7 @@ export class MenuComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly renderer = inject(Renderer2);
   private readonly appwrite = inject(AppwriteService);
+  private readonly analytics = inject(AnalyticsService);
 
   menu = signal<DailyMenu | null>(null);
   italianDayName = signal<string>('')
@@ -90,6 +96,7 @@ export class MenuComponent implements OnInit {
 
     if (this.isMobile() && !this.storage()?.getItem('swipe-hint-seen')) {
       this.showSwipeHint.set(true);
+      this.analytics.swipeHintShown();
     }
   }
 
@@ -123,12 +130,14 @@ export class MenuComponent implements OnInit {
     this.menuWeekNumber.set(this.getMenuWeekNumber());
     this.handleWeekend();
 
-    if (!this.weekend()) {
+    if (this.weekend()) {
+      this.analytics.weekendViewed();
+    } else {
       this.loadMenu();
     }
   }
 
-  nextDay() {
+  nextDay(method: DayNavMethod = 'button') {
     const nextOffset = this.dayOffset() + 1;
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + nextOffset);
@@ -137,30 +146,50 @@ export class MenuComponent implements OnInit {
       return; // no weekend
     }
 
+    const from = this.italianDayName();
+
     this.triggerSlide('left', () => {
       this.dayOffset.set(nextOffset);
       this.loading.set(true);
       this.menu.set(null);
       this.updateDisplayDate();
+
+      this.analytics.dayChanged({
+        from,
+        to: this.italianDayName(),
+        direction: 'next',
+        method
+      });
     });
   }
 
-  previousDay() {
+  previousDay(method: DayNavMethod = 'button') {
     if (this.dayOfWeekNumber() <= 0) {
       return;
     }
+
+    const from = this.italianDayName();
 
     this.triggerSlide('right', () => {
       this.dayOffset.update(v => v - 1);
       this.loading.set(true);
       this.menu.set(null);
       this.updateDisplayDate();
+
+      this.analytics.dayChanged({
+        from,
+        to: this.italianDayName(),
+        direction: 'previous',
+        method
+      });
     });
   }
 
   async loadMenu() {
     const storage = this.storage();
     const cacheKey = `menu-${this.menuWeekNumber()}-${this.dayOfWeekNumber()}`;
+    const startedAt = Date.now();
+    const course = this.italianDayName();
 
     try {
       const cachedMenu = storage?.getItem(cacheKey);
@@ -177,6 +206,11 @@ export class MenuComponent implements OnInit {
           this.createMenu();
           this.loading.set(false)
           this.error.set(false)
+          this.analytics.menuLoaded({
+            source: 'cache',
+            course,
+            durationMs: Date.now() - startedAt
+          })
 
         } else {
           console.log('Menù non aggiornato')
@@ -189,6 +223,7 @@ export class MenuComponent implements OnInit {
           console.error(error);
           this.error.set(true);
           this.loading.set(false)
+          this.analytics.menuError({ course })
         }).then(value => {
           this.menu.set(value);
           this.defineQuantityCourses();
@@ -200,6 +235,11 @@ export class MenuComponent implements OnInit {
             );
             this.loading.set(false)
             this.error.set(false)
+            this.analytics.menuLoaded({
+              source: 'network',
+              course,
+              durationMs: Date.now() - startedAt
+            })
           }
         })
       }
@@ -208,6 +248,7 @@ export class MenuComponent implements OnInit {
       console.error('Error fetching menu:', err);
       this.loading.set(false)
       this.error.set(true)
+      this.analytics.menuError({ course })
       // Clean storage cache
       storage?.clear()
     }
@@ -263,16 +304,27 @@ export class MenuComponent implements OnInit {
     this.num_contorni.set(this.menu()?.contorni.length!);
   }
 
+  onGuideToggled(open: boolean) {
+    this.analytics.guideToggled({ open, courses: this.coursesCreator().length });
+  }
+
   onPointerDown(event: PointerEvent) {
-    this.dismissSwipeHint();
+    if (this.showSwipeHint()) {
+      this.dismissSwipeHint('tap');
+    }
     this.startX = event.clientX;
     this.startY = event.clientY;
     this.tracking = true;
   }
 
-  dismissSwipeHint() {
+  dismissSwipeHint(via: 'tap' | 'swipe' = 'tap') {
+    if (!this.showSwipeHint()) {
+      return;
+    }
+
     this.storage()?.setItem('swipe-hint-seen', 'true');
     this.showSwipeHint.set(false);
+    this.analytics.swipeHintDismissed({ via });
   }
 
   onPointerUp(event: PointerEvent) {
@@ -287,15 +339,49 @@ export class MenuComponent implements OnInit {
     if (Math.abs(deltaX) < minDistance) return;
 
     if (deltaX < 0) {
-      this.nextDay();
+      this.nextDay('swipe');
     } else {
-      this.previousDay();
+      this.previousDay('swipe');
     }
+  }
+
+  /**
+   * The flat label arrays are ordered [primi, secondi, contorni, variabili],
+   * so the merged "Secondi" card draws from two non-contiguous ranges: the
+   * secondi slice and the trailing variabili slice. Taking a single slice
+   * would pick up the contorni labels instead of the variabili ones.
+   */
+  private labelsForSecondi(): CourseSection['meat_label'] {
+    const labels = this.menu()?.meat_label;
+    if (!labels) return [];
+    return [
+      ...labels.slice(this.num_primi(), this.num_primi() + this.num_secondi()),
+      ...labels.slice(this.num_primi() + this.num_secondi() + this.num_contorni())
+    ];
+  }
+
+  private fishLabelsForSecondi(): CourseSection['fish_label'] {
+    const labels = this.menu()?.fish_label;
+    if (!labels) return [];
+    return [
+      ...labels.slice(this.num_primi(), this.num_primi() + this.num_secondi()),
+      ...labels.slice(this.num_primi() + this.num_secondi() + this.num_contorni())
+    ];
+  }
+
+  private veganLabelsForSecondi(): CourseSection['vegan_label'] {
+    const labels = this.menu()?.vegan_label;
+    if (!labels) return [];
+    return [
+      ...labels.slice(this.num_primi(), this.num_primi() + this.num_secondi()),
+      ...labels.slice(this.num_primi() + this.num_secondi() + this.num_contorni())
+    ];
   }
 
   private createMenu() {
     this.coursesCreator.set([
       {
+        id: 'primi',
         title: 'Primi',
         icon: '🍝',
         dishes: this.menu()?.primi_piatti!,
@@ -304,14 +390,19 @@ export class MenuComponent implements OnInit {
         vegan_label: this.menu()?.vegan_label!.slice(0, this.num_primi())!,
       },
       {
+        id: 'secondi',
         title: 'Secondi',
         icon: '🍖',
-        dishes: this.menu()?.secondi_piatti!,
-        meat_label: this.menu()?.meat_label!.slice(this.num_primi(), this.num_primi() + this.num_secondi())!,
-        fish_label: this.menu()?.fish_label!.slice(this.num_primi(), this.num_primi() + this.num_secondi())!,
-        vegan_label: this.menu()?.vegan_label!.slice(this.num_primi(), this.num_primi() + this.num_secondi())!,
+        dishes: [
+          ...(this.menu()?.secondi_piatti ?? []),
+          ...(this.menu()?.alternative_variabili ?? [])
+        ],
+        meat_label: this.labelsForSecondi(),
+        fish_label: this.fishLabelsForSecondi(),
+        vegan_label: this.veganLabelsForSecondi(),
       },
       {
+        id: 'contorni',
         title: 'Contorni',
         icon: '🥗',
         dishes: this.menu()?.contorni!,
@@ -328,14 +419,7 @@ export class MenuComponent implements OnInit {
       //   vegan_label: this.menu()?.vegan_label!.slice(this.num_primi() + this.num_secondi()+ this.num_contorni(), this.num_primi() + this.num_secondi() + this.num_contorni() + 1)!,
       // },
       {
-        title: 'Alternative al Secondo',
-        icon: '🧀',
-        dishes: this.menu()?.alternative_variabili!,
-        meat_label: this.menu()?.meat_label!.slice(this.num_primi() + this.num_secondi() + this.num_contorni())!,
-        fish_label: this.menu()?.fish_label!.slice(this.num_primi() + this.num_secondi() + this.num_contorni())!,
-        vegan_label: this.menu()?.vegan_label!.slice(this.num_primi() + this.num_secondi() + this.num_contorni())!,
-      },
-      {
+        id: 'dessert',
         title: 'Dessert',
         icon: '🍰',
         dishes: [

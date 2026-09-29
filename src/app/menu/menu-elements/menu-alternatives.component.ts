@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, output } from '@angular/core';
 
 export interface AlternativeItem {
   label: string;
@@ -54,7 +54,8 @@ export const PLATE_ALTERNATIVES: readonly PlateAlternative[] = [
 @Component({
   selector: 'menu-alternatives',
   templateUrl: './menu-alternatives.component.html',
-  styleUrl: './menu-alternatives.component.css'
+  styleUrl: './menu-alternatives.component.css',
+  host: { display: 'block' }
 })
 export class MenuAlternativesComponent {
   readonly rules = PLATE_ALTERNATIVES;
@@ -63,4 +64,10 @@ export class MenuAlternativesComponent {
   readonly note =
     '* I salumi e i formaggi affettati verranno erogati su richiesta, ' +
     'in base alle tipologie rese disponibili dallo chef nella giornata.';
+
+  readonly guideToggled = output<boolean>();
+
+  onToggle(event: Event) {
+    this.guideToggled.emit((event.currentTarget as HTMLDetailsElement).open);
+  }
 }

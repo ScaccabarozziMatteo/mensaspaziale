@@ -3,7 +3,8 @@ import { Component, Input } from "@angular/core";
 @Component({
   selector: 'menu-section',
   templateUrl: './menu-section.component.html',
-  styleUrls: ['../menu.component.css']
+  styleUrls: ['../menu.component.css'],
+  host: { display: 'block' }
 })
 export class MenuSectionComponent {
   @Input({ required: true }) dishes: string[] | string | undefined = [];

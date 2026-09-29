@@ -1,9 +1,6 @@
-export const firebaseConfig = {
-  apiKey: "AIzaSyDthvbKatshGdvzm1yaiWIBLBzjlIX6AJE",
-  authDomain: "mensaspaziale.firebaseapp.com",
-  projectId: "mensaspaziale",
-  storageBucket: "mensaspaziale.firebasestorage.app",
-  messagingSenderId: "181156035001",
-  appId: "1:181156035001:web:2f1c7775f9752c95c99e68",
-  measurementId: "G-LTZT241CMQ"
-};
+// Reserved for per-environment configuration.
+//
+// There is no dev/prod split yet: angular.json has no fileReplacements, so
+// this file is the single source for both. Anything machine-specific or
+// secret belongs in a *.local.ts sibling, which .gitignore already excludes.
+export {};
