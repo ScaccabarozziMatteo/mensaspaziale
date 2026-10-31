@@ -14,6 +14,7 @@
           "builder": "@angular/build:application",
           "options": {
             "browser": "src/main.ts",
+            "outputPath": "dist/angular-starter-kit-for-appwrite",
             "polyfills": [
               "zone.js"
             ],

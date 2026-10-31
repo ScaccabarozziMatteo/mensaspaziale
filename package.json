@@ -1,12 +1,15 @@
 {
   "name": "mensaspaziale",
   "version": "1.3.0",
+  "engines": {
+    "node": ">=22.22.3 <23 || >=24.15.0 <25 || >=26.0.0"
+  },
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "ng": "node scripts/ng-with-sqlite-cache.mjs",
+    "start": "npm run ng -- serve",
+    "build": "npm run ng -- build",
+    "watch": "npm run ng -- build --watch --configuration development",
+    "test": "npm run ng -- test"
   },
   "prettier": {
     "printWidth": 100,

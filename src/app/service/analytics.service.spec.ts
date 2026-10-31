@@ -120,4 +120,17 @@ describe('AnalyticsService', () => {
 
     expect(true).toBeTrue();
   });
+
+  it('does not access gtag outside the browser', () => {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [AnalyticsService, { provide: PLATFORM_ID, useValue: 'server' }]
+    });
+    service = TestBed.inject(AnalyticsService);
+    const gtag = (window as any).gtag as jasmine.Spy;
+
+    service.track('server_event');
+
+    expect(gtag).not.toHaveBeenCalled();
+  });
 });

@@ -8,6 +8,7 @@ import { StarsDirective } from '../service/stars.directive';
 import { MenuAlternativesComponent } from './menu-elements/menu-alternatives.component';
 import { MenuSectionComponent } from './menu-elements/menu-section.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { menuCycle } from '../../environment/environment';
 
 export type CourseId = 'primi' | 'secondi' | 'contorni' | 'dessert';
 
@@ -48,7 +49,6 @@ export class MenuComponent implements OnInit {
 
   readonly menuWeekNumber = signal(0);
   readonly dayOfWeekNumber = signal(0);
-  private weekNumberOffset = 0;
 
   private num_primi = signal(0);
   private num_secondi = signal(0);
@@ -95,7 +95,7 @@ export class MenuComponent implements OnInit {
       return;
     }
 
-    if (this.isMobile() && !this.storage()?.getItem('swipe-hint-seen')) {
+    if (this.isMobile() && !this.readCache('swipe-hint-seen')) {
       this.showSwipeHint.set(true);
       this.analytics.swipeHintShown();
     }
@@ -110,6 +110,30 @@ export class MenuComponent implements OnInit {
       return window.localStorage;
     } catch {
       return null;
+    }
+  }
+
+  private readCache(key: string): string | null {
+    try {
+      return this.storage()?.getItem(key) ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  private removeCache(key: string): void {
+    try {
+      this.storage()?.removeItem(key);
+    } catch {
+      // Storage may be disabled or full; menu loading should still work.
+    }
+  }
+
+  private writeCache(key: string, value: string): void {
+    try {
+      this.storage()?.setItem(key, value);
+    } catch {
+      // Storage is an optimization; a failed write must not hide a loaded menu.
     }
   }
 
@@ -187,84 +211,52 @@ export class MenuComponent implements OnInit {
   }
 
   async loadMenu() {
-    const storage = this.storage();
     const cacheKey = `menu-${this.menuWeekNumber()}-${this.dayOfWeekNumber()}`;
     const startedAt = Date.now();
     const course = this.italianDayName();
 
     try {
-      const cachedMenu = storage?.getItem(cacheKey);
-
-      if (cachedMenu !== null && cachedMenu !== undefined) {
-        console.log('Menù presente in cache')
-        const menuDate = JSON.parse(cachedMenu).date
-        const today = new Date().toLocaleDateString()
-
-        if (menuDate === today) {
-          console.log('Menù aggiornato alla data corrente')
-          this.menu.set(JSON.parse(cachedMenu))
-          this.defineQuantityCourses();
-          this.createMenu();
-          this.loading.set(false)
-          this.error.set(false)
-          this.analytics.menuLoaded({
-            source: 'cache',
-            course,
-            durationMs: Date.now() - startedAt
-          })
-
-        } else {
-          console.log('Menù non aggiornato')
-          this.menu.set(null)
-        }
-      }
-      if (this.menu() === null) {
-        console.log('Menù non presente o non aggiornato, scaricamento menù aggiornato in corso..')
-        this.appwrite.getMenu(this.menuWeekNumber(), this.dayOfWeekNumber()).catch(error => {
-          console.error(error);
-          this.error.set(true);
-          this.loading.set(false)
-          this.analytics.menuError({ course })
-        }).then(value => {
-          this.menu.set(value);
-          this.defineQuantityCourses();
-          this.createMenu();
-          if (value !== undefined) {
-            storage?.setItem(
-              cacheKey,
-              JSON.stringify(this.menu())
-            );
-            this.loading.set(false)
-            this.error.set(false)
-            this.analytics.menuLoaded({
-              source: 'network',
-              course,
-              durationMs: Date.now() - startedAt
-            })
+      const cachedMenu = this.readCache(cacheKey);
+      if (cachedMenu) {
+        try {
+          const parsed = JSON.parse(cachedMenu) as Partial<DailyMenu>;
+          const validMenu = Array.isArray(parsed.primi_piatti) &&
+            Array.isArray(parsed.secondi_piatti) &&
+            Array.isArray(parsed.contorni) &&
+            Array.isArray(parsed.alternative_variabili);
+          if (validMenu && parsed.date === new Date().toLocaleDateString()) {
+            this.menu.set(parsed as DailyMenu);
+            this.defineQuantityCourses();
+            this.createMenu();
+            this.loading.set(false);
+            this.error.set(false);
+            this.analytics.menuLoaded({ source: 'cache', course, durationMs: Date.now() - startedAt });
+            return;
           }
-        })
+        } catch {
+          // Discard an invalid entry and recover by requesting a fresh menu.
+        }
+        this.removeCache(cacheKey);
       }
 
+      const value = await this.appwrite.getMenu(this.menuWeekNumber(), this.dayOfWeekNumber());
+      if (!value) {
+        throw new Error(`No menu found for week ${this.menuWeekNumber()}, day ${this.dayOfWeekNumber()}`);
+      }
+      this.menu.set(value);
+      this.defineQuantityCourses();
+      this.createMenu();
+      this.writeCache(cacheKey, JSON.stringify(value));
+      this.loading.set(false);
+      this.error.set(false);
+      this.analytics.menuLoaded({ source: 'network', course, durationMs: Date.now() - startedAt });
     } catch (err) {
       console.error('Error fetching menu:', err);
-      this.loading.set(false)
-      this.error.set(true)
-      this.analytics.menuError({ course })
-      // Clean storage cache
-      storage?.clear()
+      this.menu.set(null);
+      this.loading.set(false);
+      this.error.set(true);
+      this.analytics.menuError({ course });
     }
-  }
-
-  getWeekNumber(date: Date = new Date()): number {
-    const currentDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-    const dayNum = currentDate.getUTCDay() || 7;
-    currentDate.setUTCDate(currentDate.getUTCDate() + 4 - dayNum);
-    // Get first day of year
-    const yearStart = new Date(Date.UTC(currentDate.getUTCFullYear(), 0, 1));
-
-    const weekNo = Math.ceil(((currentDate.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
-
-    return weekNo;
   }
 
   handleWeekend() {
@@ -272,7 +264,18 @@ export class MenuComponent implements OnInit {
   }
 
   getMenuWeekNumber(): number {
-    return ((this.getWeekNumber(this.displayDate()) + this.weekNumberOffset) % 4)
+    const anchor = new Date(`${menuCycle.anchorDate}T00:00:00`);
+    const date = this.displayDate();
+    const anchorUtc = Date.UTC(anchor.getFullYear(), anchor.getMonth(), anchor.getDate());
+    const dateUtc = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+    const elapsedWeeks = Math.floor((dateUtc - anchorUtc) / (7 * 86400000));
+    return ((menuCycle.anchorWeek + elapsedWeeks) % 4 + 4) % 4;
+  }
+
+  retryLoadMenu(): void {
+    this.loading.set(true);
+    this.error.set(false);
+    void this.loadMenu();
   }
 
   getDayOfWeek(date: Date = new Date()): number {
@@ -323,7 +326,7 @@ export class MenuComponent implements OnInit {
       return;
     }
 
-    this.storage()?.setItem('swipe-hint-seen', 'true');
+    this.writeCache('swipe-hint-seen', 'true');
     this.showSwipeHint.set(false);
     this.analytics.swipeHintDismissed({ via });
   }
@@ -424,7 +427,6 @@ export class MenuComponent implements OnInit {
         title: 'Dessert',
         icon: '🍰',
         dishes: [
-          'Gelato',
           'Frutta di stagione',
           'Frutta secca',
           'Polpa di frutta',

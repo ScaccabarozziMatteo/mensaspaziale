@@ -1,12 +1,12 @@
-import { Component, ElementRef, Input, OnDestroy } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { StarsDirective } from './stars.directive';
 import { PLATFORM_ID } from '@angular/core';
 
 @Component({
   selector: '[hostComponent]',
-  template: '<div [appStars]="starCount"></div>',
-  standalone: false
+  template: '<div appStars [starCount]="starCount"></div>',
+  imports: [StarsDirective]
 })
 class HostComponent {
   @Input() starCount = 10;
@@ -18,11 +18,8 @@ describe('StarsDirective', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [StarsDirective, HostComponent],
-      providers: [
-        { provide: PLATFORM_ID, useValue: 'browser' },
-        ElementRef
-      ]
+      imports: [HostComponent],
+      providers: [{ provide: PLATFORM_ID, useValue: 'browser' }]
     }).compileComponents();
   });
 
@@ -40,6 +37,7 @@ describe('StarsDirective', () => {
     expect(componentInstance).toBeTruthy();
     const directive = hostFixture.debugElement.children[0].injector.get(StarsDirective);
     expect(directive).toBeTruthy();
+    expect(hostFixture.debugElement.children[0].nativeElement.children.length).toBe(10);
   });
 
   it('should have starCount input set', () => {
@@ -48,10 +46,18 @@ describe('StarsDirective', () => {
   });
 
   it('should change star count', () => {
-    componentInstance.starCount = 20;
+    hostFixture.componentRef.setInput('starCount', 20);
     hostFixture.detectChanges();
     
     const directive = hostFixture.debugElement.children[0].injector.get(StarsDirective);
     expect(directive.starCount).toBe(20);
+    expect(hostFixture.debugElement.children[0].nativeElement.children.length).toBe(20);
+  });
+
+  it('removes created stars when the directive is destroyed', () => {
+    const host = hostFixture.debugElement.children[0].nativeElement;
+    const directive = hostFixture.debugElement.children[0].injector.get(StarsDirective);
+    directive.ngOnDestroy();
+    expect(host.children.length).toBe(0);
   });
 });

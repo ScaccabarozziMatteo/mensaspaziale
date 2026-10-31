@@ -7,7 +7,7 @@ describe('MenuSectionComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [MenuSectionComponent]
+      imports: [MenuSectionComponent]
     }).compileComponents();
 
     fixture = TestBed.createComponent(MenuSectionComponent);
@@ -52,5 +52,29 @@ describe('MenuSectionComponent', () => {
     const labels = [true, false, false];
     component.vegan_label = labels;
     expect(component.vegan_label).toEqual(labels);
+  });
+
+  it('renders the supplied dishes and explicit dietary labels', () => {
+    component.dishes = ['Vegetale', 'Carne'];
+    component.title = 'Secondi';
+    component.meat_label = [false, true];
+    component.fish_label = [false, false];
+    component.vegan_label = [false, false];
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('Vegetale');
+    expect(fixture.nativeElement.textContent).toContain('Carne');
+    expect(fixture.nativeElement.textContent).toContain('🥕');
+    expect(fixture.nativeElement.textContent).toContain('🍖');
+  });
+
+  it('does not infer vegetarian labels when Appwrite omitted the label arrays', () => {
+    component.dishes = ['Pasto senza classificazione'];
+    component.meat_label = [];
+    component.fish_label = [];
+    component.vegan_label = [];
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).not.toContain('🥕');
   });
 });

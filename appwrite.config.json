@@ -260,7 +260,7 @@
             "adapter": "static",
             "buildRuntime": "node-24",
             "installCommand": "npm ci",
-            "buildCommand": "bash prepare-env.sh && npm run build",
+            "buildCommand": "npm run build",
             "outputDirectory": "./dist/angular-starter-kit-for-appwrite/browser",
             "fallbackFile": "index.html",
             "specification": "s-2vcpu-2gb",

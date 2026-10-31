@@ -1,6 +1,21 @@
 # Mensaspaziale
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.7.
+This project uses [Angular CLI](https://github.com/angular/angular-cli) 22.2.5.
+
+## Four-week menu rotation
+
+The menu rows use week indexes `0` through `3`. The app advances that index every
+Monday from `menuCycle.anchorDate` in `src/environment/environment.ts`. Set
+`anchorDate` to a Monday whose menu week you know, then set `anchorWeek` to that
+week's database index. The checked-in date and index are provisional defaults;
+the app cannot determine which menu week is current from the rows alone.
+
+For example, if Monday 2 November is known to use database week `2`, set
+`anchorDate` to `2026-11-02` and `anchorWeek` to `2`. The index then cycles
+`2, 3, 0, 1` each Monday, including across year boundaries.
+
+The Angular CLI requires Node.js `22.22.3+` (within major 22), `24.15.0+`
+(within major 24), or `26.0.0+`.
 
 ## Development server
 

@@ -7,7 +7,7 @@ describe('MenuAlternativesComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [MenuAlternativesComponent]
+      imports: [MenuAlternativesComponent]
     }).compileComponents();
 
     fixture = TestBed.createComponent(MenuAlternativesComponent);
@@ -24,5 +24,17 @@ describe('MenuAlternativesComponent', () => {
 
   it('should have intro text', () => {
     expect(component.intro).toContain('sostituzione');
+  });
+
+  it('emits whether the guide was opened or closed', () => {
+    const states: boolean[] = [];
+    component.guideToggled.subscribe(open => states.push(open));
+    const details = document.createElement('details');
+    details.open = true;
+    component.onToggle({ currentTarget: details } as unknown as Event);
+    details.open = false;
+    component.onToggle({ currentTarget: details } as unknown as Event);
+
+    expect(states).toEqual([true, false]);
   });
 });
