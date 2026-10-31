@@ -11,7 +11,7 @@ export class AppwriteService {
   private tablesDB: TablesDB;
 
   private databaseID = tablesDB[0].$id;
-  private menu_collection_ID = tables[1].$id;
+  private menu_collection_ID = tables[2].$id;
 
   constructor() {
     this.client

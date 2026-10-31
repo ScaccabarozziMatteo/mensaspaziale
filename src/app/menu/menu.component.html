@@ -29,7 +29,7 @@
         <span class="title-emoji">🚀</span>
       </div>
       <div class="date-badge">
-        📅 {{ italianDayName() }} - Menù Estivo
+        📅 {{ italianDayName() }} - Menù Invernale
       </div>
     </header>
 
@@ -67,8 +67,8 @@
 
       }
       @else {
-  <!-- POKE -->
-   @if(dayOfWeekNumber() === 3) {
+  <!-- POKE - Only in summer menu -->
+   @if(dayOfWeekNumber() === 3 && false) {
      <menu-section icon="🍚" [dishes]="poke_ingredients" title="Pokè" />
      }
       @for(course of coursesCreator(); track course.title) {
