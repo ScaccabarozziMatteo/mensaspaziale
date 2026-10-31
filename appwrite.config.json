@@ -261,7 +261,7 @@
             "buildRuntime": "node-24",
             "installCommand": "npm ci",
             "buildCommand": "npm run build",
-            "outputDirectory": "./dist/angular-starter-kit-for-appwrite/browser",
+            "outputDirectory": "./dist/mensaspaziale/browser",
             "fallbackFile": "index.html",
             "specification": "s-2vcpu-2gb",
             "enabled": true,
