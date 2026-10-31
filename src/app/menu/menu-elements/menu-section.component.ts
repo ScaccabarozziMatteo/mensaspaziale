@@ -1,9 +1,10 @@
-import { Component, Input } from "@angular/core";
+import { Component, Input, ChangeDetectionStrategy } from "@angular/core";
 
 @Component({
   selector: 'menu-section',
   templateUrl: './menu-section.component.html',
   styleUrls: ['../menu.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: { display: 'block' }
 })
 export class MenuSectionComponent {

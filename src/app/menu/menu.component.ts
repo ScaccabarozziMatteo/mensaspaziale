@@ -1,5 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Component, DestroyRef, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, PLATFORM_ID, signal, ChangeDetectionStrategy } from '@angular/core';
 import { Renderer2 } from '@angular/core';
 import { AppwriteService } from '../../lib/appwrite';
 import { DailyMenu } from '../models/menu.model';
@@ -26,6 +26,7 @@ interface CourseSection {
   templateUrl: './menu.component.html',
   styleUrls: ['./menu.component.css'],
   host: { display: 'block' },
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [StarsDirective, MenuSectionComponent, MenuAlternativesComponent, MatProgressSpinnerModule]
 
 })

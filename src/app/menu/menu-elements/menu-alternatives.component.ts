@@ -1,4 +1,4 @@
-import { Component, output } from '@angular/core';
+import { Component, output, ChangeDetectionStrategy } from '@angular/core';
 
 export interface AlternativeItem {
   label: string;
@@ -55,6 +55,7 @@ export const PLATE_ALTERNATIVES: readonly PlateAlternative[] = [
   selector: 'menu-alternatives',
   templateUrl: './menu-alternatives.component.html',
   styleUrl: './menu-alternatives.component.css',
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: { display: 'block' }
 })
 export class MenuAlternativesComponent {
