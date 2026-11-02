@@ -1,3 +1,4 @@
+import { describe, expect, it, beforeEach } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MenuAlternativesComponent } from './menu-alternatives.component';
 

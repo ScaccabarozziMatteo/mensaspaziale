@@ -1,3 +1,5 @@
+import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest';
+import type { MockInstance } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PLATFORM_ID } from '@angular/core';
 import { AppwriteService } from '../../lib/appwrite';
@@ -5,12 +7,29 @@ import { DailyMenu } from '../models/menu.model';
 import { AnalyticsService } from '../service/analyticsService';
 import { MenuComponent } from './menu.component';
 
+function pointerEvent(type: string, init: MouseEventInit): PointerEvent {
+  return new MouseEvent(type, init) as unknown as PointerEvent;
+}
+
 describe('MenuComponent', () => {
   let component: MenuComponent;
   let fixture: ComponentFixture<MenuComponent>;
-  let appwrite: jasmine.SpyObj<AppwriteService>;
-  let analytics: jasmine.SpyObj<AnalyticsService>;
-  let storage: jasmine.SpyObj<Storage>;
+  let appwrite: { getMenu: ReturnType<typeof vi.fn> };
+  let analytics: {
+    dayChanged: ReturnType<typeof vi.fn>;
+    menuLoaded: ReturnType<typeof vi.fn>;
+    menuError: ReturnType<typeof vi.fn>;
+    weekendViewed: ReturnType<typeof vi.fn>;
+    guideToggled: ReturnType<typeof vi.fn>;
+    swipeHintShown: ReturnType<typeof vi.fn>;
+    swipeHintDismissed: ReturnType<typeof vi.fn>;
+  };
+  let storage: {
+    getItem: ReturnType<typeof vi.fn>;
+    setItem: ReturnType<typeof vi.fn>;
+    removeItem: ReturnType<typeof vi.fn>;
+  };
+  let storageAccess: MockInstance;
 
   const menu = new DailyMenu(
     'menu-1', 0, 0,
@@ -22,16 +41,21 @@ describe('MenuComponent', () => {
   );
 
   beforeEach(async () => {
-    jasmine.clock().install();
-    jasmine.clock().mockDate(new Date(2026, 9, 26, 12));
-    appwrite = jasmine.createSpyObj<AppwriteService>('AppwriteService', ['getMenu']);
-    storage = jasmine.createSpyObj<Storage>('Storage', ['getItem', 'setItem', 'removeItem']);
-    storage.getItem.and.returnValue(null);
-    analytics = jasmine.createSpyObj<AnalyticsService>('AnalyticsService', [
-      'dayChanged', 'menuLoaded', 'menuError', 'weekendViewed', 'guideToggled',
-      'swipeHintShown', 'swipeHintDismissed'
-    ]);
-    appwrite.getMenu.and.resolveTo(menu);
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 9, 26, 12));
+    appwrite = { getMenu: vi.fn() };
+    storage = { getItem: vi.fn(), setItem: vi.fn(), removeItem: vi.fn() };
+    storage.getItem.mockReturnValue(null);
+    analytics = {
+      dayChanged: vi.fn(),
+      menuLoaded: vi.fn(),
+      menuError: vi.fn(),
+      weekendViewed: vi.fn(),
+      guideToggled: vi.fn(),
+      swipeHintShown: vi.fn(),
+      swipeHintDismissed: vi.fn()
+    };
+    appwrite.getMenu.mockResolvedValue(menu);
 
     await TestBed.configureTestingModule({
       imports: [MenuComponent],
@@ -44,12 +68,14 @@ describe('MenuComponent', () => {
 
     fixture = TestBed.createComponent(MenuComponent);
     component = fixture.componentInstance;
-    spyOn<any>(component, 'storage').and.returnValue(storage);
+    storageAccess = vi.spyOn(component as any, 'storage')
+      .mockReturnValue(storage as unknown as Storage);
   });
 
   afterEach(() => {
     fixture.destroy();
-    jasmine.clock().uninstall();
+    vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
   it('initializes the weekday, requests its menu and hides the loader', async () => {
@@ -60,7 +86,7 @@ describe('MenuComponent', () => {
     expect(component.dayOfWeekNumber()).toBe(0);
     expect(appwrite.getMenu).toHaveBeenCalledWith(0, 0);
     expect(component.menu()?.id).toBe('menu-1');
-    expect(component.loading()).toBeFalse();
+    expect(component.loading()).toBe(false);
   });
 
   it('shows the weekend state without requesting a menu', () => {
@@ -68,7 +94,7 @@ describe('MenuComponent', () => {
     component.dayOffset.set(5);
     component.ngOnInit();
 
-    expect(component.weekend()).toBeTrue();
+    expect(component.weekend()).toBe(true);
     expect(appwrite.getMenu).not.toHaveBeenCalled();
     expect(analytics.weekendViewed).toHaveBeenCalled();
   });
@@ -102,11 +128,11 @@ describe('MenuComponent', () => {
     expect(courses[1].meat_label).toEqual([true, false]);
     expect(courses[1].vegan_label).toEqual([false, true]);
     expect(courses[3].dishes.length).toBe(6);
-    expect(analytics.menuLoaded).toHaveBeenCalledWith(jasmine.objectContaining({ source: 'network' }));
+    expect(analytics.menuLoaded).toHaveBeenCalledWith(expect.objectContaining({ source: 'network' }));
   });
 
   it('uses a fresh cache entry without requesting the network', async () => {
-    storage.getItem.and.returnValue(JSON.stringify(menu));
+    storage.getItem.mockReturnValue(JSON.stringify(menu));
     component.menuWeekNumber.set(0);
     component.dayOfWeekNumber.set(0);
 
@@ -114,11 +140,71 @@ describe('MenuComponent', () => {
 
     expect(component.menu()?.id).toBe('menu-1');
     expect(appwrite.getMenu).not.toHaveBeenCalled();
-    expect(analytics.menuLoaded).toHaveBeenCalledWith(jasmine.objectContaining({ source: 'cache' }));
+    expect(analytics.menuLoaded).toHaveBeenCalledWith(expect.objectContaining({ source: 'cache' }));
+  });
+
+  it('keeps a menu cached until the end of the day', async () => {
+    storage.getItem.mockReturnValue(JSON.stringify({
+      expiresAt: new Date(2026, 9, 27, 0, 0, 0, 0).getTime(),
+      menu
+    }));
+    component.menuWeekNumber.set(0);
+    component.dayOfWeekNumber.set(0);
+
+    await component.loadMenu();
+
+    expect(component.menu()?.id).toBe('menu-1');
+    expect(appwrite.getMenu).not.toHaveBeenCalled();
+    expect(analytics.menuLoaded).toHaveBeenCalledWith(expect.objectContaining({ source: 'cache' }));
+  });
+
+  it('refreshes the menu once the cached entry has expired', async () => {
+    storage.getItem.mockReturnValue(JSON.stringify({
+      expiresAt: new Date(2026, 9, 25, 23, 59, 59).getTime(),
+      menu
+    }));
+    component.menuWeekNumber.set(0);
+    component.dayOfWeekNumber.set(0);
+
+    await component.loadMenu();
+
+    expect(storage.removeItem).toHaveBeenCalledWith('menu-0-0');
+    expect(appwrite.getMenu).toHaveBeenCalledWith(0, 0);
+    expect(component.menu()?.id).toBe('menu-1');
+    expect(analytics.menuLoaded).toHaveBeenCalledWith(expect.objectContaining({ source: 'network' }));
+  });
+
+  it('prunes expired menu entries at startup but keeps unrelated storage', () => {
+    const entries = new Map<string, string>([
+      ['menu-0-0', JSON.stringify({ expiresAt: Date.now() - 1, menu })],
+      ['menu-0-1', JSON.stringify({ expiresAt: Date.now() + 60_000, menu })],
+      ['swipe-hint-seen', 'true']
+    ]);
+    const memoryStorage = {
+      get length() {
+        return entries.size;
+      },
+      key: (index: number) => Array.from(entries.keys())[index] ?? null,
+      getItem: (key: string) => entries.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        entries.set(key, value);
+      },
+      removeItem: (key: string) => {
+        entries.delete(key);
+      },
+      clear: () => entries.clear()
+    } as Storage;
+    storageAccess.mockReturnValue(memoryStorage);
+
+    component.ngOnInit();
+
+    expect(entries.has('menu-0-0')).toBe(false);
+    expect(entries.has('menu-0-1')).toBe(true);
+    expect(entries.has('swipe-hint-seen')).toBe(true);
   });
 
   it('discards malformed or stale cache and fetches a fresh menu', async () => {
-    storage.getItem.and.returnValue('{bad json');
+    storage.getItem.mockReturnValue('{bad json');
     component.menuWeekNumber.set(0);
     component.dayOfWeekNumber.set(0);
 
@@ -130,41 +216,41 @@ describe('MenuComponent', () => {
   });
 
   it('does not fail a loaded menu when browser storage is unavailable', async () => {
-    storage.getItem.and.throwError('storage blocked');
-    storage.setItem.and.throwError('storage blocked');
-    storage.removeItem.and.throwError('storage blocked');
+    storage.getItem.mockImplementation(() => { throw new Error('storage blocked'); });
+    storage.setItem.mockImplementation(() => { throw new Error('storage blocked'); });
+    storage.removeItem.mockImplementation(() => { throw new Error('storage blocked'); });
     component.menuWeekNumber.set(0);
     component.dayOfWeekNumber.set(0);
 
     await component.loadMenu();
 
     expect(component.menu()?.id).toBe('menu-1');
-    expect(component.error()).toBeFalse();
+    expect(component.error()).toBe(false);
   });
 
   it('shows an error for a missing menu and can retry', async () => {
-    appwrite.getMenu.and.resolveTo(null);
-    spyOn(console, 'error');
+    appwrite.getMenu.mockResolvedValue(null);
+    vi.spyOn(console, 'error').mockImplementation(() => {});
     component.italianDayName.set('Lunedì');
     await component.loadMenu();
-    expect(component.error()).toBeTrue();
-    expect(component.loading()).toBeFalse();
+    expect(component.error()).toBe(true);
+    expect(component.loading()).toBe(false);
 
-    appwrite.getMenu.and.resolveTo(menu);
+    appwrite.getMenu.mockResolvedValue(menu);
     component.retryLoadMenu();
     await Promise.resolve();
-    expect(component.error()).toBeFalse();
+    expect(component.error()).toBe(false);
     expect(component.menu()?.id).toBe('menu-1');
   });
 
   it('shows an error when Appwrite rejects', async () => {
-    appwrite.getMenu.and.rejectWith(new Error('offline'));
-    spyOn(console, 'error');
+    appwrite.getMenu.mockRejectedValue(new Error('offline'));
+    vi.spyOn(console, 'error').mockImplementation(() => {});
     component.italianDayName.set('Lunedì');
 
     await component.loadMenu();
 
-    expect(component.error()).toBeTrue();
+    expect(component.error()).toBe(true);
     expect(analytics.menuError).toHaveBeenCalledWith({ course: 'Lunedì' });
   });
 
@@ -173,9 +259,9 @@ describe('MenuComponent', () => {
     component.dayOfWeekNumber.set(0);
     component.italianDayName.set('Lunedì');
     component.nextDay();
-    jasmine.clock().tick(300);
+    vi.advanceTimersByTime(300);
     expect(component.dayOffset()).toBe(1);
-    expect(analytics.dayChanged).toHaveBeenCalledWith(jasmine.objectContaining({
+    expect(analytics.dayChanged).toHaveBeenCalledWith(expect.objectContaining({
       direction: 'next', method: 'button', to: 'Martedì'
     }));
 
@@ -183,7 +269,7 @@ describe('MenuComponent', () => {
     component.dayOfWeekNumber.set(4);
     component.italianDayName.set('Venerdì');
     component.nextDay();
-    jasmine.clock().tick(300);
+    vi.advanceTimersByTime(300);
     expect(component.dayOffset()).toBe(4);
   });
 
@@ -192,34 +278,34 @@ describe('MenuComponent', () => {
     component.dayOfWeekNumber.set(1);
     component.italianDayName.set('Martedì');
     component.previousDay();
-    jasmine.clock().tick(300);
+    vi.advanceTimersByTime(300);
     expect(component.dayOffset()).toBe(0);
-    expect(analytics.dayChanged).toHaveBeenCalledWith(jasmine.objectContaining({
+    expect(analytics.dayChanged).toHaveBeenCalledWith(expect.objectContaining({
       direction: 'previous', method: 'button', to: 'Lunedì'
     }));
 
     component.dayOfWeekNumber.set(0);
     component.previousDay();
-    jasmine.clock().tick(300);
+    vi.advanceTimersByTime(300);
     expect(component.dayOffset()).toBe(0);
   });
 
   it('handles swipe hints and ignores short or vertical gestures', () => {
     component.showSwipeHint.set(true);
-    spyOn(component, 'nextDay');
-    spyOn(component, 'previousDay');
-    component.onPointerDown(new PointerEvent('pointerdown', { clientX: 150, clientY: 100 }));
-    expect(component.showSwipeHint()).toBeFalse();
+    vi.spyOn(component, 'nextDay');
+    vi.spyOn(component, 'previousDay');
+    component.onPointerDown(pointerEvent('pointerdown', { clientX: 150, clientY: 100 }));
+    expect(component.showSwipeHint()).toBe(false);
     expect(analytics.swipeHintDismissed).toHaveBeenCalledWith({ via: 'tap' });
 
-    component.onPointerUp(new PointerEvent('pointerup', { clientX: 180, clientY: 100 }));
-    component.onPointerDown(new PointerEvent('pointerdown', { clientX: 150, clientY: 100 }));
-    component.onPointerUp(new PointerEvent('pointerup', { clientX: 80, clientY: 200 }));
+    component.onPointerUp(pointerEvent('pointerup', { clientX: 180, clientY: 100 }));
+    component.onPointerDown(pointerEvent('pointerdown', { clientX: 150, clientY: 100 }));
+    component.onPointerUp(pointerEvent('pointerup', { clientX: 80, clientY: 200 }));
     expect(component.nextDay).not.toHaveBeenCalled();
     expect(component.previousDay).not.toHaveBeenCalled();
 
-    component.onPointerDown(new PointerEvent('pointerdown', { clientX: 150, clientY: 100 }));
-    component.onPointerUp(new PointerEvent('pointerup', { clientX: 80, clientY: 101 }));
+    component.onPointerDown(pointerEvent('pointerdown', { clientX: 150, clientY: 100 }));
+    component.onPointerUp(pointerEvent('pointerup', { clientX: 80, clientY: 101 }));
     expect(component.nextDay).toHaveBeenCalledWith('swipe');
   });
 
@@ -230,6 +316,6 @@ describe('MenuComponent', () => {
 
     component.dayOfWeekNumber.set(6);
     component.handleWeekend();
-    expect(component.weekend()).toBeTrue();
+    expect(component.weekend()).toBe(true);
   });
 });

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Client, TablesDB, Query } from 'appwrite';
 import { DailyMenu } from '../app/models/menu.model';
-import { projectId, endpoint, tablesDB, tables } from '../../appwrite.config.json';
+import { appwriteConfig } from '../environment/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -10,13 +10,13 @@ export class AppwriteService {
   private client = new Client();
   private tablesDB: TablesDB;
 
-  private readonly databaseID = tablesDB[0].$id;
-  private readonly menuTableID = tables[2].$id;
+  private readonly databaseID = appwriteConfig.databaseId;
+  private readonly menuTableID = appwriteConfig.menuTableId;
 
   constructor() {
     this.client
-      .setEndpoint(endpoint)
-      .setProject(projectId);
+      .setEndpoint(appwriteConfig.endpoint)
+      .setProject(appwriteConfig.projectId);
 
     this.tablesDB = new TablesDB(this.client);
   }

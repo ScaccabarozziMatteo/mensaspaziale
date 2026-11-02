@@ -12,6 +12,12 @@ import { menuCycle } from '../../environment/environment';
 
 export type CourseId = 'primi' | 'secondi' | 'contorni' | 'dessert';
 
+/** Menu cache entries are valid only until local midnight. */
+interface MenuCacheEntry {
+  expiresAt: number;
+  menu: DailyMenu;
+}
+
 interface CourseSection {
   id: CourseId;
   title: string;
@@ -89,6 +95,10 @@ export class MenuComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      this.pruneExpiredMenuCache();
+    }
+
     this.updateDisplayDate();
 
     if (!isPlatformBrowser(this.platformId)) {
@@ -134,6 +144,79 @@ export class MenuComponent implements OnInit {
       this.storage()?.setItem(key, value);
     } catch {
       // Storage is an optimization; a failed write must not hide a loaded menu.
+    }
+  }
+
+  /** Local midnight that follows the current instant. */
+  private endOfDay(): number {
+    const midnight = new Date();
+    midnight.setHours(24, 0, 0, 0);
+    return midnight.getTime();
+  }
+
+  /**
+   * Returns the cached menu only while it is still valid, otherwise null.
+   * Current entries carry an end-of-day expiry. Legacy entries without an
+   * expiry are accepted only on the day they were written.
+   */
+  private parseMenuCache(raw: string): DailyMenu | null {
+    try {
+      const parsed = JSON.parse(raw) as Partial<MenuCacheEntry> & Partial<DailyMenu>;
+      const entry = parsed.menu ?? parsed;
+      const validMenu = Array.isArray(entry.primi_piatti) &&
+        Array.isArray(entry.secondi_piatti) &&
+        Array.isArray(entry.contorni) &&
+        Array.isArray(entry.alternative_variabili);
+
+      if (!validMenu) {
+        return null;
+      }
+
+      if (typeof parsed.expiresAt === 'number') {
+        return parsed.expiresAt > Date.now() ? entry as DailyMenu : null;
+      }
+
+      return entry.date === new Date().toLocaleDateString() ? entry as DailyMenu : null;
+    } catch {
+      return null;
+    }
+  }
+
+  /** Drops every menu entry whose end-of-day expiry has passed. */
+  private pruneExpiredMenuCache(): void {
+    const storage = this.storage();
+    if (!storage) {
+      return;
+    }
+
+    const expiredKeys: string[] = [];
+    try {
+      for (let index = 0; index < storage.length; index++) {
+        const key = storage.key(index);
+        if (!key?.startsWith('menu-')) {
+          continue;
+        }
+
+        const raw = storage.getItem(key);
+        if (!raw) {
+          continue;
+        }
+
+        try {
+          const entry = JSON.parse(raw) as Partial<MenuCacheEntry>;
+          if (typeof entry.expiresAt !== 'number' || entry.expiresAt <= Date.now()) {
+            expiredKeys.push(key);
+          }
+        } catch {
+          expiredKeys.push(key);
+        }
+      }
+
+      for (const key of expiredKeys) {
+        storage.removeItem(key);
+      }
+    } catch {
+      // Storage may be blocked; menu loading still works without pruning.
     }
   }
 
@@ -218,23 +301,15 @@ export class MenuComponent implements OnInit {
     try {
       const cachedMenu = this.readCache(cacheKey);
       if (cachedMenu) {
-        try {
-          const parsed = JSON.parse(cachedMenu) as Partial<DailyMenu>;
-          const validMenu = Array.isArray(parsed.primi_piatti) &&
-            Array.isArray(parsed.secondi_piatti) &&
-            Array.isArray(parsed.contorni) &&
-            Array.isArray(parsed.alternative_variabili);
-          if (validMenu && parsed.date === new Date().toLocaleDateString()) {
-            this.menu.set(parsed as DailyMenu);
-            this.defineQuantityCourses();
-            this.createMenu();
-            this.loading.set(false);
-            this.error.set(false);
-            this.analytics.menuLoaded({ source: 'cache', course, durationMs: Date.now() - startedAt });
-            return;
-          }
-        } catch {
-          // Discard an invalid entry and recover by requesting a fresh menu.
+        const cached = this.parseMenuCache(cachedMenu);
+        if (cached) {
+          this.menu.set(cached);
+          this.defineQuantityCourses();
+          this.createMenu();
+          this.loading.set(false);
+          this.error.set(false);
+          this.analytics.menuLoaded({ source: 'cache', course, durationMs: Date.now() - startedAt });
+          return;
         }
         this.removeCache(cacheKey);
       }
@@ -246,7 +321,7 @@ export class MenuComponent implements OnInit {
       this.menu.set(value);
       this.defineQuantityCourses();
       this.createMenu();
-      this.writeCache(cacheKey, JSON.stringify(value));
+      this.writeCache(cacheKey, JSON.stringify({ expiresAt: this.endOfDay(), menu: value }));
       this.loading.set(false);
       this.error.set(false);
       this.analytics.menuLoaded({ source: 'network', course, durationMs: Date.now() - startedAt });

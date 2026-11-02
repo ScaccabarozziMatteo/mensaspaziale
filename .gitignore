@@ -13,7 +13,6 @@ npm-debug.log*
 yarn-error.log*
 yarn-debug.log*
 pnpm-debug.log*
-.firebase/
 
 # IDEs and editors
 .idea/
@@ -53,7 +52,6 @@ __screenshots__/
 
 # Logs
 *.log
-firebase-debug.log
 ui-debug.log
 
 # Caches

@@ -1,3 +1,5 @@
+import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { AnalyticsService } from './analyticsService';
 import { PLATFORM_ID } from '@angular/core';
@@ -20,7 +22,7 @@ describe('AnalyticsService', () => {
 
   beforeEach(() => {
     // Mock window.gtag globally
-    (window as any).gtag = jasmine.createSpy('gtag');
+    (window as any).gtag = vi.fn();
   });
 
   afterEach(() => {
@@ -118,7 +120,7 @@ describe('AnalyticsService', () => {
       method: 'button'
     });
 
-    expect(true).toBeTrue();
+    expect(true).toBe(true);
   });
 
   it('does not access gtag outside the browser', () => {
@@ -127,7 +129,7 @@ describe('AnalyticsService', () => {
       providers: [AnalyticsService, { provide: PLATFORM_ID, useValue: 'server' }]
     });
     service = TestBed.inject(AnalyticsService);
-    const gtag = (window as any).gtag as jasmine.Spy;
+    const gtag = (window as any).gtag as Mock;
 
     service.track('server_event');
 

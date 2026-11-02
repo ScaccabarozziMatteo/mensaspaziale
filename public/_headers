@@ -1,0 +1,17 @@
+# Security headers for hosts that support the `_headers` convention
+# (Cloudflare Pages, Netlify, and similar static hosts).
+#
+# Appwrite Sites currently ignores this file, so the live site still relies on
+# the CSP and Referrer-Policy <meta> tags in index.html plus the HSTS and
+# X-Content-Type-Options headers that Appwrite already sends. To get
+# frame-ancestors, Permissions-Policy and X-Frame-Options on Appwrite Sites,
+# put Cloudflare (or another CDN) in front of the site and apply these headers
+# there.
+
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https://www.google-analytics.com; media-src 'self'; connect-src 'self' https://fra.cloud.appwrite.io https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self' blob:; frame-src 'none'; frame-ancestors 'none'
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()

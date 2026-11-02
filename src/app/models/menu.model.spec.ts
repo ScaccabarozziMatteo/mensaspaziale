@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { DailyMenu } from './menu.model';
 
 describe('DailyMenu Model', () => {

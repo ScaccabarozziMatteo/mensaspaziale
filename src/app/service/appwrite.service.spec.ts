@@ -1,14 +1,16 @@
+import { describe, expect, it, beforeEach, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { AppwriteService } from '../../lib/appwrite';
 
 describe('AppwriteService', () => {
   let service: AppwriteService;
-  let listRows: jasmine.Spy;
+  let listRows: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({ providers: [AppwriteService] });
     service = TestBed.inject(AppwriteService);
-    listRows = spyOn<any>(service['tablesDB'], 'listRows');
+    listRows = vi.fn();
+    (service['tablesDB'] as unknown as { listRows: typeof listRows }).listRows = listRows;
   });
 
   it('creates the Appwrite menu service', () => {
@@ -17,7 +19,7 @@ describe('AppwriteService', () => {
   });
 
   it('maps a menu row to the app model and supplies empty label arrays when omitted', async () => {
-    listRows.and.resolveTo({ rows: [{
+    listRows.mockResolvedValue({ rows: [{
       $id: 'row-1', week: 2, day: 3,
       primi_piatti: ['Pasta'], secondi_piatti: ['Tofu'],
       piatto_dello_chef: 'Chef', contorni: ['Insalata'], alternative_variabili: ['Uova']
@@ -26,7 +28,7 @@ describe('AppwriteService', () => {
     const result = await service.getMenu(2, 3);
 
     expect(listRows).toHaveBeenCalled();
-    expect(result).toEqual(jasmine.objectContaining({
+    expect(result).toEqual(expect.objectContaining({
       id: 'row-1', week: 2, day: 3,
       primi_piatti: ['Pasta'], secondi_piatti: ['Tofu'],
       piatto_dello_chef: 'Chef', contorni: ['Insalata'], alternative_variabili: ['Uova'],
@@ -35,17 +37,17 @@ describe('AppwriteService', () => {
   });
 
   it('returns null when the requested menu row does not exist', async () => {
-    listRows.and.resolveTo({ rows: [] });
-    await expectAsync(service.getMenu(1, 0)).toBeResolvedTo(null);
+    listRows.mockResolvedValue({ rows: [] });
+    await expect(service.getMenu(1, 0)).resolves.toBeNull();
   });
 
   it('rejects ambiguous duplicate menu rows', async () => {
-    listRows.and.resolveTo({ rows: [{ $id: 'a' }, { $id: 'b' }] });
-    await expectAsync(service.getMenu(1, 0)).toBeRejectedWithError(/Multiple menu rows/);
+    listRows.mockResolvedValue({ rows: [{ $id: 'a' }, { $id: 'b' }] });
+    await expect(service.getMenu(1, 0)).rejects.toThrow(/Multiple menu rows/);
   });
 
   it('propagates Appwrite request errors', async () => {
-    listRows.and.rejectWith(new Error('network error'));
-    await expectAsync(service.getMenu(1, 0)).toBeRejectedWithError('network error');
+    listRows.mockRejectedValue(new Error('network error'));
+    await expect(service.getMenu(1, 0)).rejects.toThrow('network error');
   });
 });
